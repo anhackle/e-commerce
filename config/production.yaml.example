@@ -1,0 +1,24 @@
+server:
+  port: 8082
+  mode: dev
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  username: admin
+  password: admin
+  dbname: moneymanage
+  maxIdleConns: 10
+  maxOpenConns: 100
+  connMaxLifeTime: 3600
+logger:
+  logLevel: debug
+  fileLogName: "./storages/logs/dev.001.log"
+  maxSize: 500
+  maxBackups: 3
+  maxAge: 28
+  Compress: true
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: 
+  database: 0

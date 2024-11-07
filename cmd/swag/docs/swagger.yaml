@@ -1,0 +1,56 @@
+basePath: /v1/
+definitions:
+  model.RegisterInput:
+    properties:
+      verify_key:
+        type: string
+      verify_purpose:
+        type: string
+      verify_type:
+        type: integer
+    type: object
+  response.ResponseData:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact:
+    email: nguyencaothai.vn@gmail.com
+    name: ANLE
+    url: nguyencaothai.vn
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: github.com/anle/codebase/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  //users/authen/register:
+    post:
+      consumes:
+      - application/json
+      description: When user registered, send otp to email
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ResponseData'
+      summary: User Registration
+      tags:
+      - Authentication
+swagger: "2.0"

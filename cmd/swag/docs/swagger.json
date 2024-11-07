@@ -1,0 +1,84 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server celler server.",
+        "title": "Swagger Example API",
+        "termsOfService": "github.com/anle/codebase/",
+        "contact": {
+            "name": "ANLE",
+            "url": "nguyencaothai.vn",
+            "email": "nguyencaothai.vn@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8082",
+    "basePath": "/v1/",
+    "paths": {
+        "//users/authen/register": {
+            "post": {
+                "description": "When user registered, send otp to email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User Registration",
+                "parameters": [
+                    {
+                        "description": "payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.RegisterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ResponseData"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.RegisterInput": {
+            "type": "object",
+            "properties": {
+                "verify_key": {
+                    "type": "string"
+                },
+                "verify_purpose": {
+                    "type": "string"
+                },
+                "verify_type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.ResponseData": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

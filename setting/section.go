@@ -32,9 +32,16 @@ type RedisSetting struct {
 	Database int    `mapstructure:"database"`
 }
 
+type JWTSetting struct {
+	LifeSpan int    `mapstructure:"TOKEN_HOUR_LIFESPAN"`
+	Expire   string `mapstructure:"JWT_EXPIRATION"`
+	Secret   string `mapstructure:"API_SECRET"`
+}
+
 type Config struct {
 	Server ServerSetting `mapstructure:"server"`
 	Mysql  MySQLSetting  `mapstructrue:"mysql"`
 	Logger LoggerSetting `mapstructure:"logger"`
 	Redis  RedisSetting  `mapstructure:"redis"`
+	JWT    JWTSetting    `mapstructure:"jwt"`
 }

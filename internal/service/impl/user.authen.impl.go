@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -14,6 +15,7 @@ import (
 	"github.com/anle/codebase/internal/database"
 	"github.com/anle/codebase/internal/service"
 	"github.com/anle/codebase/internal/utils"
+	"github.com/anle/codebase/internal/utils/auth"
 	"github.com/anle/codebase/internal/utils/crypto"
 	"github.com/anle/codebase/internal/utils/random"
 	"github.com/anle/codebase/model"
@@ -25,8 +27,48 @@ type sUserAuthen struct {
 	r *database.Queries
 }
 
-func (s *sUserAuthen) Login(ctx context.Context) error {
-	return nil
+func (s *sUserAuthen) Login(ctx context.Context, in *model.LoginInput) (codeResult int, out model.LoginOutput, err error) {
+	userBase, err := s.r.GetOneUserInfoAdmin(ctx, in.UserAccount)
+	if err != nil {
+		return response.ErrCodeAccountNotExist, model.LoginOutput{}, err
+	}
+
+	if !crypto.MatchingPassword(userBase.UserPassword, in.UserPassword, userBase.UserSalt) {
+		return response.ErrCodeAccountNotExist, out, fmt.Errorf("does not match password")
+	}
+
+	//TODO: Check two-factor authentication
+
+	go s.r.LoginUserBase(ctx, database.LoginUserBaseParams{
+		UserLoginIp:  sql.NullString{String: "127.0.0.1", Valid: true},
+		UserAccount:  in.UserAccount,
+		UserPassword: in.UserPassword,
+	})
+
+	subToken := utils.GenerateClientTokenUUID(int(userBase.UserID))
+	log.Println("subtoken:", subToken)
+	infoUser, err := s.r.GetUser(ctx, uint64(userBase.UserID))
+	if err != nil {
+		return response.ErrCodeAccountNotExist, out, err
+	}
+
+	infoUserJson, err := json.Marshal(infoUser)
+	if err != nil {
+		return response.ErrCodeAccountNotExist, out, fmt.Errorf("convert to json fail")
+	}
+
+	err = global.Rdb.Set(ctx, subToken, infoUserJson, time.Duration(consts.TIME_OTP_REGISTER)*time.Minute).Err()
+	if err != nil {
+		return response.ErrCodeAccountNotExist, out, err
+	}
+
+	out.Token, err = auth.CreateToken(subToken)
+	if err != nil {
+		return response.ErrCodeAccountNotExist, out, err
+	}
+
+	return 200, out, nil
+
 }
 
 func (s *sUserAuthen) Register(ctx context.Context, in *model.RegisterInput) (codeResult int, err error) {
@@ -57,7 +99,7 @@ func (s *sUserAuthen) Register(ctx context.Context, in *model.RegisterInput) (co
 	case err != nil:
 		fmt.Println("get failed::", err)
 	case otpFound != "":
-		return response.ErrCodeUserHasExists, fmt.Errorf("")
+		return response.ErrCodeUserHasExists, fmt.Errorf("please get otp after 1 minute")
 	}
 
 	//4. Generate OTP
@@ -104,12 +146,71 @@ func (s *sUserAuthen) Register(ctx context.Context, in *model.RegisterInput) (co
 	return response.ErrCodeSuccess, nil
 }
 
-func (s *sUserAuthen) VerifyOTP(ctx context.Context, in *model.VerifyInput) (out *model.VerifyOTPOutput, err error) {
-	panic("error")
+func (s *sUserAuthen) VerifyOTP(ctx context.Context, in *model.VerifyInput) (out model.VerifyOTPOutput, err error) {
+	hashKey := crypto.GetHash(strings.ToLower(in.VerifyKey))
+
+	otpFound, err := global.Rdb.Get(ctx, utils.GetUserKey(hashKey)).Result()
+	if err != nil {
+		return out, err
+	}
+
+	if in.VerifyCode != otpFound {
+		// TODO: 3 time wrong OTP in 1 minute
+		return out, fmt.Errorf("OTP not match")
+	}
+
+	infoOTP, err := s.r.GetInfoOTP(ctx, hashKey)
+	if err != nil {
+		return out, err
+	}
+
+	err = s.r.UpdateUserVerifiationStatus(ctx, hashKey)
+	if err != nil {
+		return out, err
+	}
+
+	// fmt.Println(out.Message)
+	// out = &model.VerifyOTPOutput{
+	// 	Token:   infoOTP.VerifyKeyHash,
+	// 	Message: "success",
+	// }
+
+	out.Token = infoOTP.VerifyKeyHash
+	out.Message = "success"
+
+	return out, err
 }
 
-func (s *sUserAuthen) UpdatePasswordRegister(ctx context.Context) error {
-	return nil
+func (s *sUserAuthen) UpdatePasswordRegister(ctx context.Context, token, password string) (userId int, err error) {
+	infoOTP, err := s.r.GetInfoOTP(ctx, token)
+	if err != nil {
+		return userId, fmt.Errorf("OTP not exists")
+	}
+
+	if infoOTP.IsVerified.Int32 == 0 {
+		return userId, fmt.Errorf("user OTP not verified")
+	}
+
+	userBase := database.AddUserBaseParams{}
+	userBase.UserAccount = infoOTP.VerifyKey
+	userSalt, err := crypto.GenerateSalt(16)
+	if err != nil {
+		return response.ErrCodeOTPInvalid, nil
+	}
+
+	userBase.UserSalt = userSalt
+	userBase.UserPassword = crypto.HashPassword(password, userSalt)
+	newUserBase, err := s.r.AddUserBase(ctx, userBase)
+	if err != nil {
+		return response.ErrCodeOTPInvalid, err
+	}
+	user_id, err := newUserBase.LastInsertId()
+	if err != nil {
+		return response.ErrCodeOTPInvalid, err
+	}
+
+	return int(user_id), nil
+
 }
 
 func NewUserAuthenImpl(r *database.Queries) service.IUserAuthen {

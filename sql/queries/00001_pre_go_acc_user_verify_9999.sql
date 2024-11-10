@@ -21,7 +21,14 @@ INSERT INTO `pre_go_acc_user_verify_9999` (
     verify_created_at,
     verify_updated_at
 )
-VALUES (?, ?, ?, ?, 0, 0, NOW(), NOW());
+VALUES (?, ?, ?, ?, 0, 0, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+    verify_otp = VALUES(verify_otp),
+    verify_key_hash = VALUES(verify_key_hash),
+    verify_type = VALUES(verify_type),
+    is_verified = VALUES(is_verified),
+    is_deleted = VALUES(is_deleted),
+    verify_updated_at = NOW();
 
 -- name: GetInfoOTP :one
 SELECT verify_id, verify_otp, verify_key, verify_key_hash, verify_type, is_verified, is_deleted, verify_created_at

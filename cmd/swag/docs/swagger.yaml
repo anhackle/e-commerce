@@ -1,5 +1,12 @@
-basePath: /v1/
+basePath: /v1
 definitions:
+  model.LoginInput:
+    properties:
+      user_account:
+        type: string
+      user_password:
+        type: string
+    type: object
   model.RegisterInput:
     properties:
       verify_key:
@@ -8,6 +15,13 @@ definitions:
         type: string
       verify_type:
         type: integer
+    type: object
+  model.VerifyInput:
+    properties:
+      verify_code:
+        type: string
+      verify_key:
+        type: string
     type: object
   response.ResponseData:
     properties:
@@ -31,7 +45,29 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
-  //users/authen/register:
+  /users/authen/login:
+    post:
+      consumes:
+      - application/json
+      description: When user login successfully, return JWT
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ResponseData'
+      summary: User Login
+      tags:
+      - Authentication
+  /users/authen/register:
     post:
       consumes:
       - application/json
@@ -51,6 +87,28 @@ paths:
           schema:
             $ref: '#/definitions/response.ResponseData'
       summary: User Registration
+      tags:
+      - Authentication
+  /users/authen/verifyOTP:
+    post:
+      consumes:
+      - application/json
+      description: When user send OTP, this will check OTP
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.VerifyInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ResponseData'
+      summary: User Verify OTP
       tags:
       - Authentication
 swagger: "2.0"

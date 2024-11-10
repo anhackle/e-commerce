@@ -13,6 +13,7 @@ func (p *UserRouter) InitUserRouter(router *gin.RouterGroup) {
 	{
 		authenRouterPublic.POST("/login", user.Authen.Login)
 		authenRouterPublic.POST("/register", user.Authen.Register)
+		authenRouterPublic.POST("/verifyOTP", user.Authen.VerifyOTP)
 	}
 
 }

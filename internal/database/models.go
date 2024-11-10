@@ -20,6 +20,21 @@ type PreGoAccUserBase9999 struct {
 	UserUpdatedAt  sql.NullTime
 }
 
+type PreGoAccUserInfo9999 struct {
+	UserID               uint64
+	UserAccount          string
+	UserNickname         sql.NullString
+	UserAvatar           sql.NullString
+	UserState            uint8
+	UserMobile           sql.NullString
+	UserGender           sql.NullInt16
+	UserBirthday         sql.NullTime
+	UserEmail            sql.NullString
+	UserIsAuthentication uint8
+	CreatedAt            sql.NullTime
+	UpdatedAt            sql.NullTime
+}
+
 type PreGoAccUserVerify9999 struct {
 	VerifyID        int32
 	VerifyOtp       string

@@ -1,0 +1,6 @@
+config/dev.yaml
+config/production.yaml
+storages/*
+.vscode/*
+test/*
+k8s/*

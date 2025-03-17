@@ -1,4 +1,4 @@
-package token
+package jwttoken
 
 import (
 	"fmt"
@@ -8,14 +8,14 @@ import (
 )
 
 func VerifyJWTToken(tokenString string) (userID int, err error) {
-	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(global.Config.JWT.Key), nil
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	if claims, ok := token.Claims.(*MyCustomClaims); ok {
+	if claims, ok := token.Claims.(*JWTClaims); ok {
 		return claims.UserID, nil
 	}
 

@@ -6,7 +6,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: cungsao
+      MYSQL_DATABASE: ecommerce
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     ports:

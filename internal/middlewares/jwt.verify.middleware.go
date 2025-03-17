@@ -3,7 +3,7 @@ package middlewares
 import (
 	"strings"
 
-	"github.com/anle/codebase/internal/utils/token"
+	"github.com/anle/codebase/internal/utils/jwttoken"
 	"github.com/anle/codebase/response"
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +29,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		}
 
 		accessToken := arrayHeaderValues[1]
-		userID, err := token.VerifyJWTToken(accessToken)
+		userID, err := jwttoken.VerifyJWTToken(accessToken)
 		if err != nil {
 			response.ErrorResponseNotAuthorize(c, response.ErrCodeNotAuthorize, nil)
 			c.Abort()

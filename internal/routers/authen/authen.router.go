@@ -15,5 +15,6 @@ func (ar *AuthenRouter) InitAuthenRouter(router *gin.RouterGroup) {
 
 	{
 		AuthenRouterPublic.POST("/register", authenController.Register)
+		AuthenRouterPublic.POST("/login", authenController.Login)
 	}
 }

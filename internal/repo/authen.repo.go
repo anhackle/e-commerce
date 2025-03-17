@@ -9,15 +9,15 @@ import (
 )
 
 type IAuthenRepo interface {
-	CreateUser(ctx context.Context, userInput model.UserInput) (err error)
-	FindByEmail(ctx context.Context, input model.UserInput) (user database.User, err error)
+	CreateUser(ctx context.Context, input model.RegisterInput) (err error)
+	FindByEmail(ctx context.Context, input string) (user database.User, err error)
 }
 
 type authenRepo struct {
 	queries *database.Queries
 }
 
-func (ar *authenRepo) CreateUser(ctx context.Context, input model.UserInput) (err error) {
+func (ar *authenRepo) CreateUser(ctx context.Context, input model.RegisterInput) (err error) {
 	_, err = ar.queries.CreateUser(ctx, database.CreateUserParams{
 		Email:    input.Email,
 		Password: input.Password,
@@ -29,8 +29,8 @@ func (ar *authenRepo) CreateUser(ctx context.Context, input model.UserInput) (er
 	return nil
 }
 
-func (ar *authenRepo) FindByEmail(ctx context.Context, input model.UserInput) (user database.User, err error) {
-	user, err = ar.queries.FindByEmail(ctx, input.Email)
+func (ar *authenRepo) FindByEmail(ctx context.Context, input string) (user database.User, err error) {
+	user, err = ar.queries.FindByEmail(ctx, input)
 	if err != nil {
 		return database.User{}, err
 	}

@@ -4,23 +4,8 @@
 
 package database
 
-import (
-	"time"
-)
-
 type User struct {
 	ID       int32
 	Email    string
 	Password string
-}
-
-type UserInfo struct {
-	ID          int32
-	UserID      int32
-	FullName    string
-	Gender      bool
-	BirthDay    time.Time
-	Address     string
-	Phone       string
-	Description string
 }

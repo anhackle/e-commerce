@@ -1,5 +1,5 @@
 GOOSE_DRIVER ?= mysql
-GOOSE_DBSTRING ?= "admin:admin@tcp(127.0.0.1:3306)/ecomerce"
+GOOSE_DBSTRING ?= "admin:admin@tcp(127.0.0.1:3306)/ecommerce"
 GOOSE_MIGRATION_DIR ?= sql/schema
 
 # app name

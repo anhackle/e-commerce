@@ -1,4 +1,4 @@
-package token
+package jwttoken
 
 import (
 	"time"
@@ -10,13 +10,13 @@ import (
 func GenJWTToken(userID int) (token string, err error) {
 	mySigningKey := []byte(global.Config.JWT.Key)
 
-	claims := MyCustomClaims{
+	claims := JWTClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    "ecomerce-backend",
+			Issuer:    "ecommerce-backend",
 		},
 	}
 

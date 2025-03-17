@@ -1,8 +1,8 @@
-package token
+package jwttoken
 
 import "github.com/golang-jwt/jwt/v5"
 
-type MyCustomClaims struct {
+type JWTClaims struct {
 	UserID int `json:"userID"`
 	jwt.RegisteredClaims
 }

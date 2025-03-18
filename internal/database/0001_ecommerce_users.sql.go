@@ -27,6 +27,16 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Res
 	return q.db.ExecContext(ctx, createUser, arg.Email, arg.Password)
 }
 
+const createUserProfile = `-- name: CreateUserProfile :execresult
+INSERT INTO ` + "`" + `user_profile` + "`" + ` (
+    user_id
+) VALUES (?)
+`
+
+func (q *Queries) CreateUserProfile(ctx context.Context, userID int32) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createUserProfile, userID)
+}
+
 const findByEmail = `-- name: FindByEmail :one
 SELECT id, email, password
 FROM ` + "`" + `user` + "`" + `

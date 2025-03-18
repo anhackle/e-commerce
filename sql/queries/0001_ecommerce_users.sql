@@ -9,3 +9,8 @@ VALUES (?, ?);
 SELECT id, email, password
 FROM `user`
 WHERE email = ?;
+
+-- name: CreateUserProfile :execresult
+INSERT INTO `user_profile` (
+    user_id
+) VALUES (?);

@@ -4,8 +4,21 @@
 
 package database
 
+import (
+	"database/sql"
+)
+
 type User struct {
 	ID       int32
 	Email    string
 	Password string
+}
+
+type UserProfile struct {
+	ID          int32
+	UserID      int32
+	FirstName   sql.NullString
+	LastName    sql.NullString
+	PhoneNumber sql.NullString
+	Address     sql.NullString
 }

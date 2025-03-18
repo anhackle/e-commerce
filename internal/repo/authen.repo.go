@@ -9,7 +9,8 @@ import (
 )
 
 type IAuthenRepo interface {
-	CreateUser(ctx context.Context, input model.RegisterInput) (err error)
+	CreateUser(ctx context.Context, input model.RegisterInput) (result sql.Result, err error)
+	CreateUserProfile(ctx context.Context, userID int) (err error)
 	FindByEmail(ctx context.Context, input string) (user database.User, err error)
 }
 
@@ -17,16 +18,26 @@ type authenRepo struct {
 	queries *database.Queries
 }
 
-func (ar *authenRepo) CreateUser(ctx context.Context, input model.RegisterInput) (err error) {
-	_, err = ar.queries.CreateUser(ctx, database.CreateUserParams{
-		Email:    input.Email,
-		Password: input.Password,
-	})
+// CreateUserProfile implements IAuthenRepo.
+func (ar *authenRepo) CreateUserProfile(ctx context.Context, userID int) (err error) {
+	_, err = ar.queries.CreateUserProfile(ctx, int32(userID))
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (ar *authenRepo) CreateUser(ctx context.Context, input model.RegisterInput) (result sql.Result, err error) {
+	result, err = ar.queries.CreateUser(ctx, database.CreateUserParams{
+		Email:    input.Email,
+		Password: input.Password,
+	})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }
 
 func (ar *authenRepo) FindByEmail(ctx context.Context, input string) (user database.User, err error) {

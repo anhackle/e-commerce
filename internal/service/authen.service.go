@@ -39,7 +39,17 @@ func (as *authenService) Register(ctx context.Context, input model.RegisterInput
 		Email:    input.Email,
 		Password: hashPassword,
 	}
-	err = as.authenRepo.CreateUser(ctx, userInput)
+	sqlResult, err := as.authenRepo.CreateUser(ctx, userInput)
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	userID, err := sqlResult.LastInsertId()
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	err = as.authenRepo.CreateUserProfile(ctx, int(userID))
 	if err != nil {
 		return response.ErrCodeInternal, err
 	}

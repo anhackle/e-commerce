@@ -49,3 +49,32 @@ func (q *Queries) FindByEmail(ctx context.Context, email string) (User, error) {
 	err := row.Scan(&i.ID, &i.Email, &i.Password)
 	return i, err
 }
+
+const findByUserId = `-- name: FindByUserId :one
+SELECT id, email, password
+FROM ` + "`" + `user` + "`" + `
+WHERE id = ?
+`
+
+func (q *Queries) FindByUserId(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRowContext(ctx, findByUserId, id)
+	var i User
+	err := row.Scan(&i.ID, &i.Email, &i.Password)
+	return i, err
+}
+
+const updatePassword = `-- name: UpdatePassword :execresult
+UPDATE ` + "`" + `user` + "`" + `
+SET
+    password = ?
+WHERE id = ?
+`
+
+type UpdatePasswordParams struct {
+	Password string
+	ID       int32
+}
+
+func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updatePassword, arg.Password, arg.ID)
+}

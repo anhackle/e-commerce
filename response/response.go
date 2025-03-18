@@ -31,6 +31,12 @@ func HandleResult(c *gin.Context, result int, data any) {
 
 	case ErrCodeNotAuthorize:
 		ErrorResponseNotAuthorize(c, result, nil)
+
+	case ErrCodePasswordNotMatch:
+		ErrorResponseExternal(c, result, nil)
+
+	case ErrCodeOldPasswordNotMatch:
+		ErrorResponseExternal(c, result, nil)
 	}
 }
 

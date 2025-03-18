@@ -21,3 +21,12 @@ func InitAuthenRouterHandler(dbc *sql.DB) (*controller.AuthenController, error) 
 	authenController := controller.NewAuthenController(iAuthenService)
 	return authenController, nil
 }
+
+// Injectors from user.wire.go:
+
+func InitUserRouterHandler(dbc *sql.DB) (*controller.UserController, error) {
+	iUserRepo := repo.NewUserRepo(dbc)
+	iUserService := service.NewUserService(iUserRepo)
+	userController := controller.NewUserController(iUserService)
+	return userController, nil
+}

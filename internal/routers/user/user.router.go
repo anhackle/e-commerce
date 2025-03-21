@@ -16,7 +16,7 @@ func (ur *UserRouter) InitUserRouter(router *gin.RouterGroup) {
 	UserRouterPublic.Use(middlewares.JWTMiddleware())
 
 	{
-		UserRouterPublic.PUT("/update-profile", userController.UpdateProfile)
-		UserRouterPublic.POST("/change-password", userController.ChangePassword)
+		UserRouterPublic.PUT("/profile", userController.UpdateProfile)
+		UserRouterPublic.POST("/password", userController.ChangePassword)
 	}
 }

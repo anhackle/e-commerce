@@ -20,6 +20,7 @@ func InitRouter() *gin.Engine {
 
 	authenRouter := routers.RouterGroupApp.Authen
 	userRouter := routers.RouterGroupApp.User
+	adminRouter := routers.RouterGroupApp.Admin
 
 	MainGroup := r.Group("/v1")
 	MainGroup.Use(middlewares.CORSMiddleware())
@@ -27,6 +28,7 @@ func InitRouter() *gin.Engine {
 	{
 		authenRouter.InitAuthenRouter(MainGroup)
 		userRouter.InitUserRouter(MainGroup)
+		adminRouter.InitAdminRouter(MainGroup)
 	}
 
 	return r

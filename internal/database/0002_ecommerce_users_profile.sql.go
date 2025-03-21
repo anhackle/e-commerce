@@ -10,6 +10,16 @@ import (
 	"database/sql"
 )
 
+const createUserProfile = `-- name: CreateUserProfile :execresult
+INSERT INTO ` + "`" + `user_profile` + "`" + ` (
+    user_id
+) VALUES (?)
+`
+
+func (q *Queries) CreateUserProfile(ctx context.Context, userID int32) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createUserProfile, userID)
+}
+
 const updateUserProfile = `-- name: UpdateUserProfile :execresult
 UPDATE ` + "`" + `user_profile` + "`" + `
 SET

@@ -17,6 +17,7 @@ type IAuthenService interface {
 }
 
 type authenService struct {
+	db         *sql.DB
 	authenRepo repo.IAuthenRepo
 }
 
@@ -35,25 +36,45 @@ func (as *authenService) Register(ctx context.Context, input model.RegisterInput
 		return response.ErrCodeInternal, err
 	}
 
+	tx, err := as.db.Begin()
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+	txRepo := as.authenRepo.WithTx(tx)
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		}
+	}()
+
 	var userInput = model.RegisterInput{
 		Email:    input.Email,
 		Password: hashPassword,
 	}
-	sqlResult, err := as.authenRepo.CreateUser(ctx, userInput)
+	sqlResult, err := txRepo.CreateUser(ctx, userInput)
 	if err != nil {
+		tx.Rollback()
 		return response.ErrCodeInternal, err
 	}
 
 	userID, err := sqlResult.LastInsertId()
 	if err != nil {
+		tx.Rollback()
 		return response.ErrCodeInternal, err
 	}
 
-	err = as.authenRepo.CreateUserProfile(ctx, int(userID))
+	err = txRepo.CreateUserProfile(ctx, int(userID))
 	if err != nil {
+		tx.Rollback()
 		return response.ErrCodeInternal, err
 	}
 
+	if err := tx.Commit(); err != nil {
+		return response.ErrCodeInternal, err
+	}
 	return response.ErrCodeSuccess, nil
 }
 
@@ -76,8 +97,9 @@ func (as *authenService) Login(ctx context.Context, input model.LoginInput) (tok
 	return token, response.ErrCodeSuccess, nil
 }
 
-func NewAuthenService(authenRepo repo.IAuthenRepo) IAuthenService {
+func NewAuthenService(db *sql.DB, authenRepo repo.IAuthenRepo) IAuthenService {
 	return &authenService{
+		db:         db,
 		authenRepo: authenRepo,
 	}
 }

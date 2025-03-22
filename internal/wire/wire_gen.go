@@ -17,7 +17,7 @@ import (
 
 func InitAuthenRouterHandler(dbc *sql.DB) (*controller.AuthenController, error) {
 	iAuthenRepo := repo.NewAuthenRepo(dbc)
-	iAuthenService := service.NewAuthenService(iAuthenRepo)
+	iAuthenService := service.NewAuthenService(dbc, iAuthenRepo)
 	authenController := controller.NewAuthenController(iAuthenService)
 	return authenController, nil
 }

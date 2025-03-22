@@ -12,10 +12,17 @@ type IAuthenRepo interface {
 	CreateUser(ctx context.Context, input model.RegisterInput) (result sql.Result, err error)
 	CreateUserProfile(ctx context.Context, userID int) (err error)
 	FindByEmail(ctx context.Context, input string) (user database.User, err error)
+	WithTx(tx *sql.Tx) IAuthenRepo
 }
 
 type authenRepo struct {
 	queries *database.Queries
+}
+
+func (ar *authenRepo) WithTx(tx *sql.Tx) IAuthenRepo {
+	return &authenRepo{
+		queries: ar.queries.WithTx(tx),
+	}
 }
 
 // CreateUserProfile implements IAuthenRepo.

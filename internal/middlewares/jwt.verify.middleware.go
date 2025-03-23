@@ -29,7 +29,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		}
 
 		accessToken := arrayHeaderValues[1]
-		userID, err := jwttoken.VerifyJWTToken(accessToken)
+		userID, role, err := jwttoken.VerifyJWTToken(accessToken)
 		if err != nil {
 			response.ErrorResponseNotAuthorize(c, response.ErrCodeNotAuthorize, nil)
 			c.Abort()
@@ -37,6 +37,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("userID", userID)
+		c.Set("role", role)
 		c.Next()
 	}
 }

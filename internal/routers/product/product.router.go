@@ -20,7 +20,7 @@ func (pr *ProductRouter) InitProductRouter(router *gin.RouterGroup) {
 
 	productRouterPrivate := router.Group("/products")
 	productRouterPrivate.Use(middlewares.JWTMiddleware())
-	//TODO: Middleware check whether admin or not
+	productRouterPrivate.Use(middlewares.RoleVerifyMiddleware())
 
 	{
 		productRouterPrivate.POST("/", productController.CreateProduct)

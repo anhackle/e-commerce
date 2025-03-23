@@ -11,6 +11,12 @@ type UserController struct {
 	userService service.IUserService
 }
 
+func (uc *UserController) GetProfile(c *gin.Context) {
+	profileResult, result, _ := uc.userService.GetProfile(c)
+
+	response.HandleResult(c, result, profileResult)
+}
+
 func (uc *UserController) UpdateProfile(c *gin.Context) {
 	var input model.UpdateProfileInput
 	if err := c.ShouldBindJSON(&input); err != nil {

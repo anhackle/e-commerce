@@ -12,12 +12,30 @@ import (
 )
 
 type IUserService interface {
+	GetProfile(ctx context.Context) (profileResult model.GetProfileOutput, result int, err error)
 	UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (result int, err error)
 	ChangePassword(ctx context.Context, input model.ChangePasswordInput) (result int, err error)
 }
 
 type userService struct {
 	userRepo repo.IUserRepo
+}
+
+// GetProfile implements IUserService.
+func (us *userService) GetProfile(ctx context.Context) (profileResult model.GetProfileOutput, result int, err error) {
+	user, err := us.userRepo.GetProfile(ctx, ctx.Value("userID").(int))
+	if err != nil {
+		return profileResult, response.ErrCodeInternal, err
+	}
+
+	profileResult = model.GetProfileOutput{
+		FirstName:   user.FirstName.String,
+		LastName:    user.LastName.String,
+		PhoneNumber: user.PhoneNumber.String,
+		Address:     user.Address.String,
+	}
+
+	return profileResult, response.ErrCodeSuccess, nil
 }
 
 func (us *userService) UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (result int, err error) {

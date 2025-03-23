@@ -10,12 +10,24 @@ import (
 
 type IUserRepo interface {
 	UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (err error)
+	GetProfile(ctx context.Context, userId int) (user database.GetUserProfileRow, err error)
 	FindByUserId(ctx context.Context, userID int) (user database.User, err error)
 	ChangePassword(ctx context.Context, newPassword string) (err error)
 }
 
 type userRepo struct {
 	queries *database.Queries
+}
+
+// GetProfile implements IUserRepo.
+func (ur *userRepo) GetProfile(ctx context.Context, userId int) (user database.GetUserProfileRow, err error) {
+	user, err = ur.queries.GetUserProfile(ctx, int32(userId))
+	if err != nil {
+		return database.GetUserProfileRow{}, err
+	}
+
+	return user, nil
+
 }
 
 func (ur *userRepo) ChangePassword(ctx context.Context, newPassword string) (err error) {

@@ -10,6 +10,31 @@ import (
 	"database/sql"
 )
 
+const getUserProfile = `-- name: GetUserProfile :one
+SELECT first_name, last_name, phone_number, address
+FROM ` + "`" + `user_profile` + "`" + `
+WHERE user_id = ?
+`
+
+type GetUserProfileRow struct {
+	FirstName   sql.NullString
+	LastName    sql.NullString
+	PhoneNumber sql.NullString
+	Address     sql.NullString
+}
+
+func (q *Queries) GetUserProfile(ctx context.Context, userID int32) (GetUserProfileRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserProfile, userID)
+	var i GetUserProfileRow
+	err := row.Scan(
+		&i.FirstName,
+		&i.LastName,
+		&i.PhoneNumber,
+		&i.Address,
+	)
+	return i, err
+}
+
 const updateUserProfile = `-- name: UpdateUserProfile :execresult
 UPDATE ` + "`" + `user_profile` + "`" + `
 SET

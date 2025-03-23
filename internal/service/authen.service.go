@@ -89,7 +89,7 @@ func (as *authenService) Login(ctx context.Context, input model.LoginInput) (tok
 		return "", response.ErrCodeNotAuthorize, nil
 	}
 
-	token, err = jwttoken.GenJWTToken(int(user.ID))
+	token, err = jwttoken.GenJWTToken(int(user.ID), string(user.Role.UserRole))
 	if err != nil {
 		return "", response.ErrCodeInternal, err
 	}

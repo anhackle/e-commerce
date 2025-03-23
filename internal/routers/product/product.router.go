@@ -1,0 +1,28 @@
+package product
+
+import (
+	"github.com/anle/codebase/global"
+	"github.com/anle/codebase/internal/middlewares"
+	"github.com/anle/codebase/internal/wire"
+	"github.com/gin-gonic/gin"
+)
+
+type ProductRouter struct{}
+
+func (pr *ProductRouter) InitProductRouter(router *gin.RouterGroup) {
+	productController, _ := wire.InitProductRouterHandler(global.Mdb)
+
+	productRouterPublic := router.Group("/products")
+
+	{
+		productRouterPublic.POST("/search", productController.GetProducts)
+	}
+
+	productRouterPrivate := router.Group("/products")
+	productRouterPrivate.Use(middlewares.JWTMiddleware())
+	//TODO: Middleware check whether admin or not
+
+	{
+		productRouterPrivate.POST("/", productController.CreateProduct)
+	}
+}

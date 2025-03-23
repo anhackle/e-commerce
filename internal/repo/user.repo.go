@@ -11,7 +11,7 @@ import (
 type IUserRepo interface {
 	UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (err error)
 	GetProfile(ctx context.Context, userId int) (user database.GetUserProfileRow, err error)
-	FindByUserId(ctx context.Context, userID int) (user database.User, err error)
+	FindByUserId(ctx context.Context, userID int) (user database.FindByUserIdRow, err error)
 	ChangePassword(ctx context.Context, newPassword string) (err error)
 }
 
@@ -57,10 +57,10 @@ func (ur *userRepo) UpdateProfile(ctx context.Context, input model.UpdateProfile
 	return nil
 }
 
-func (ur *userRepo) FindByUserId(ctx context.Context, userID int) (user database.User, err error) {
+func (ur *userRepo) FindByUserId(ctx context.Context, userID int) (user database.FindByUserIdRow, err error) {
 	user, err = ur.queries.FindByUserId(ctx, int32(userID))
 	if err != nil {
-		return database.User{}, err
+		return database.FindByUserIdRow{}, err
 	}
 
 	return user, nil

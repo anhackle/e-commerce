@@ -21,7 +21,7 @@ type productRepo struct {
 func (pr *productRepo) GetProducts(ctx context.Context, input model.GetProductInput) (products []database.GetProductsRow, err error) {
 	products, err = pr.queries.GetProducts(ctx, database.GetProductsParams{
 		Limit:  int32(input.Limit),
-		Offset: int32(input.Page) - 1,
+		Offset: int32(input.Page),
 	})
 	if err != nil {
 		return products, err

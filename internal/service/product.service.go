@@ -19,7 +19,11 @@ type productService struct {
 
 // GetProducts implements IProductService.
 func (ps *productService) GetProducts(ctx context.Context, input model.GetProductInput) (products []model.GetProductOutput, result int, err error) {
-	productsRepo, err := ps.productRepo.GetProducts(ctx, input)
+	var getProductInput = model.GetProductInput{
+		Limit: input.Limit,
+		Page:  (input.Page - 1) * input.Limit,
+	}
+	productsRepo, err := ps.productRepo.GetProducts(ctx, getProductInput)
 	if err != nil {
 		return products, response.ErrCodeInternal, err
 	}

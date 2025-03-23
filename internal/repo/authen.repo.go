@@ -11,7 +11,7 @@ import (
 type IAuthenRepo interface {
 	CreateUser(ctx context.Context, input model.RegisterInput) (result sql.Result, err error)
 	CreateUserProfile(ctx context.Context, userID int) (err error)
-	FindByEmail(ctx context.Context, input string) (user database.User, err error)
+	FindByEmail(ctx context.Context, input string) (user database.FindByEmailRow, err error)
 	WithTx(tx *sql.Tx) IAuthenRepo
 }
 
@@ -47,10 +47,10 @@ func (ar *authenRepo) CreateUser(ctx context.Context, input model.RegisterInput)
 	return result, nil
 }
 
-func (ar *authenRepo) FindByEmail(ctx context.Context, input string) (user database.User, err error) {
+func (ar *authenRepo) FindByEmail(ctx context.Context, input string) (user database.FindByEmailRow, err error) {
 	user, err = ar.queries.FindByEmail(ctx, input)
 	if err != nil {
-		return database.User{}, err
+		return database.FindByEmailRow{}, err
 	}
 
 	return user, nil

@@ -38,28 +38,52 @@ func (q *Queries) CreateUserProfile(ctx context.Context, userID int32) (sql.Resu
 }
 
 const findByEmail = `-- name: FindByEmail :one
-SELECT id, email, password
+SELECT id, email, password, role
 FROM ` + "`" + `user` + "`" + `
 WHERE email = ?
 `
 
-func (q *Queries) FindByEmail(ctx context.Context, email string) (User, error) {
+type FindByEmailRow struct {
+	ID       int32
+	Email    string
+	Password string
+	Role     NullUserRole
+}
+
+func (q *Queries) FindByEmail(ctx context.Context, email string) (FindByEmailRow, error) {
 	row := q.db.QueryRowContext(ctx, findByEmail, email)
-	var i User
-	err := row.Scan(&i.ID, &i.Email, &i.Password)
+	var i FindByEmailRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Role,
+	)
 	return i, err
 }
 
 const findByUserId = `-- name: FindByUserId :one
-SELECT id, email, password
+SELECT id, email, password, role
 FROM ` + "`" + `user` + "`" + `
 WHERE id = ?
 `
 
-func (q *Queries) FindByUserId(ctx context.Context, id int32) (User, error) {
+type FindByUserIdRow struct {
+	ID       int32
+	Email    string
+	Password string
+	Role     NullUserRole
+}
+
+func (q *Queries) FindByUserId(ctx context.Context, id int32) (FindByUserIdRow, error) {
 	row := q.db.QueryRowContext(ctx, findByUserId, id)
-	var i User
-	err := row.Scan(&i.ID, &i.Email, &i.Password)
+	var i FindByUserIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Role,
+	)
 	return i, err
 }
 

@@ -6,7 +6,7 @@ INSERT INTO `user` (
 VALUES (?, ?);
 
 -- name: FindByEmail :one
-SELECT id, email, password
+SELECT id, email, password, role
 FROM `user`
 WHERE email = ?;
 
@@ -16,7 +16,7 @@ INSERT INTO `user_profile` (
 ) VALUES (?);
 
 -- name: FindByUserId :one
-SELECT id, email, password
+SELECT id, email, password, role
 FROM `user`
 WHERE id = ?;
 

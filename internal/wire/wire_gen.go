@@ -22,6 +22,15 @@ func InitAuthenRouterHandler(dbc *sql.DB) (*controller.AuthenController, error) 
 	return authenController, nil
 }
 
+// Injectors from product.wire.go:
+
+func InitProductRouterHandler(dbc *sql.DB) (*controller.ProductController, error) {
+	iProductRepo := repo.NewProductRepo(dbc)
+	iProductService := service.NewProductService(iProductRepo)
+	productController := controller.NewProductController(iProductService)
+	return productController, nil
+}
+
 // Injectors from user.wire.go:
 
 func InitUserRouterHandler(dbc *sql.DB) (*controller.UserController, error) {

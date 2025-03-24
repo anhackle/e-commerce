@@ -39,9 +39,20 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (s
 	)
 }
 
+const deleteProduct = `-- name: DeleteProduct :execresult
+UPDATE ` + "`" + `product` + "`" + `
+SET deleted_at = NOW()
+WHERE id = ?
+`
+
+func (q *Queries) DeleteProduct(ctx context.Context, id int32) (sql.Result, error) {
+	return q.db.ExecContext(ctx, deleteProduct, id)
+}
+
 const getProducts = `-- name: GetProducts :many
 SELECT id, name, description, price, quantity, image_url
 FROM ` + "`" + `product` + "`" + `
+WHERE deleted_at IS NULL
 LIMIT ?
 OFFSET ?
 `
@@ -88,4 +99,35 @@ func (q *Queries) GetProducts(ctx context.Context, arg GetProductsParams) ([]Get
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateProduct = `-- name: UpdateProduct :execresult
+UPDATE ` + "`" + `product` + "`" + `
+SET
+    name = ?,
+    description = ?,
+    price = ?,
+    quantity = ?,
+    image_url = ?
+WHERE id = ?
+`
+
+type UpdateProductParams struct {
+	Name        string
+	Description sql.NullString
+	Price       int64
+	Quantity    int32
+	ImageUrl    string
+	ID          int32
+}
+
+func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateProduct,
+		arg.Name,
+		arg.Description,
+		arg.Price,
+		arg.Quantity,
+		arg.ImageUrl,
+		arg.ID,
+	)
 }

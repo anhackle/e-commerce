@@ -60,6 +60,7 @@ type Product struct {
 	Quantity    int32
 	ImageUrl    string
 	CreatedAt   sql.NullTime
+	DeletedAt   sql.NullTime
 }
 
 type User struct {

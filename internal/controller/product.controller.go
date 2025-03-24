@@ -13,6 +13,28 @@ type ProductController struct {
 	productService service.IProductService
 }
 
+func (pc *ProductController) DeleteProduct(c *gin.Context) {
+	var input model.DeleteProductInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	result, _ := pc.productService.DeleteProduct(c, input)
+	response.HandleResult(c, result, nil)
+}
+
+func (pc *ProductController) UpdateProduct(c *gin.Context) {
+	var input model.UpdateProductInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	result, _ := pc.productService.UpdateProduct(c, input)
+	response.HandleResult(c, result, nil)
+}
+
 func (pc *ProductController) GetProducts(c *gin.Context) {
 	var input model.GetProductInput
 	if err := c.ShouldBindJSON(&input); err != nil {

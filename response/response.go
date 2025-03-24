@@ -37,6 +37,9 @@ func HandleResult(c *gin.Context, result int, data any) {
 
 	case ErrCodeOldPasswordNotMatch:
 		ErrorResponseExternal(c, result, nil)
+
+	case ErrCodeProductNotFound:
+		ErrorResponseExternal(c, result, nil)
 	}
 }
 

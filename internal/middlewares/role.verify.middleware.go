@@ -7,14 +7,15 @@ import (
 
 func RoleVerifyMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		role, err := c.Value("role").(string)
-		if !err {
+		roleVal, exists := c.Get("role")
+		if !exists {
 			response.ErrorResponseNotAuthorize(c, response.ErrCodeNotAuthorize, nil)
 			c.Abort()
 			return
 		}
 
-		if role != "admin" {
+		role, ok := roleVal.(string)
+		if !ok || role != "admin" {
 			response.ErrorResponseNotAuthorize(c, response.ErrCodeNotAuthorize, nil)
 			c.Abort()
 			return

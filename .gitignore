@@ -2,5 +2,4 @@ config/dev.yaml
 config/production.yaml
 storages/*
 .vscode/*
-tests/*
 k8s/*

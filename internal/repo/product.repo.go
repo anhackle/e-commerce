@@ -26,6 +26,10 @@ func (pr *productRepo) DeleteProduct(ctx context.Context, input model.DeleteProd
 		return result, err
 	}
 
+	if rows, _ := result.RowsAffected(); rows == 0 {
+		return result, sql.ErrNoRows
+	}
+
 	return result, nil
 }
 
@@ -41,6 +45,10 @@ func (pr *productRepo) UpdateProduct(ctx context.Context, input model.UpdateProd
 	})
 	if err != nil {
 		return result, err
+	}
+
+	if rows, _ := result.RowsAffected(); rows == 0 {
+		return result, sql.ErrNoRows
 	}
 
 	return result, nil

@@ -8,6 +8,7 @@ const (
 	ErrCodeUserHasExists       = 40003
 	ErrCodePasswordNotMatch    = 40004
 	ErrCodeOldPasswordNotMatch = 40005
+	ErrCodeProductNotFound     = 40006
 	ErrCodeInternal            = 50000
 )
 
@@ -21,4 +22,5 @@ var msg = map[int]string{
 	ErrCodeNotAuthorize:        "Not authorized",
 	ErrCodePasswordNotMatch:    "Password not match",
 	ErrCodeOldPasswordNotMatch: "Old password not match",
+	ErrCodeProductNotFound:     "Product not found",
 }

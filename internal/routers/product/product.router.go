@@ -24,5 +24,7 @@ func (pr *ProductRouter) InitProductRouter(router *gin.RouterGroup) {
 
 	{
 		productRouterPrivate.POST("/", productController.CreateProduct)
+		productRouterPrivate.PUT("/", productController.UpdateProduct)
+		productRouterPrivate.DELETE("/", productController.DeleteProduct)
 	}
 }

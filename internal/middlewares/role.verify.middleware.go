@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
-
 	"github.com/anle/codebase/response"
 	"github.com/gin-gonic/gin"
 )
@@ -15,8 +13,6 @@ func RoleVerifyMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
-		fmt.Println(role)
 
 		if role != "admin" {
 			response.ErrorResponseNotAuthorize(c, response.ErrCodeNotAuthorize, nil)

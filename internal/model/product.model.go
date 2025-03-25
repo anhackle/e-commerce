@@ -9,7 +9,7 @@ type CreateProductInput struct {
 }
 
 type UpdateProductInput struct {
-	ID          int    `json:"id" binding:"required,numeric"`
+	ID          int    `json:"id" binding:"required,numeric,min=0"`
 	Name        string `json:"name" binding:"required,name,max=255"`
 	Description string `json:"description" binding:"required"`
 	Price       int    `json:"price" binding:"required,numeric"`
@@ -18,7 +18,7 @@ type UpdateProductInput struct {
 }
 
 type DeleteProductInput struct {
-	ID int `json:"id" binding:"required,numeric"`
+	ID int `json:"id" binding:"required,numeric,min=0"`
 }
 
 type GetProductInput struct {

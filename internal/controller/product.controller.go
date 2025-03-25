@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/anle/codebase/internal/model"
 	"github.com/anle/codebase/internal/service"
 	"github.com/anle/codebase/response"
@@ -38,7 +36,6 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 func (pc *ProductController) GetProducts(c *gin.Context) {
 	var input model.GetProductInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		fmt.Println(err)
 		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
 		return
 	}

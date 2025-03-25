@@ -13,10 +13,32 @@ type IProductRepo interface {
 	UpdateProduct(ctx context.Context, input model.UpdateProductInput) (result sql.Result, err error)
 	DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result sql.Result, err error)
 	GetProducts(ctx context.Context, input model.GetProductInput) (products []database.GetProductsRow, err error)
+	GetProductByID(ctx context.Context, productID int) (product database.GetProductByIDRow, err error)
+	GetQuantity(ctx context.Context, productID int) (quantity int32, err error)
 }
 
 type productRepo struct {
 	queries *database.Queries
+}
+
+// GetProductByID implements IProductRepo.
+func (pr *productRepo) GetProductByID(ctx context.Context, productID int) (product database.GetProductByIDRow, err error) {
+	product, err = pr.queries.GetProductByID(ctx, int32(productID))
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+// GetQuantity implements IProductRepo.
+func (pr *productRepo) GetQuantity(ctx context.Context, productID int) (quantity int32, err error) {
+	quantity, err = pr.queries.GetQuantity(ctx, int32(productID))
+	if err != nil {
+		return quantity, err
+	}
+
+	return quantity, nil
 }
 
 // DeleteProduct implements IProductRepo.

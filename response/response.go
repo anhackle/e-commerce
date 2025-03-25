@@ -40,6 +40,12 @@ func HandleResult(c *gin.Context, result int, data any) {
 
 	case ErrCodeProductNotFound:
 		ErrorResponseExternal(c, result, nil)
+
+	case ErrCodeQuantityNotEnough:
+		ErrorResponseExternal(c, result, nil)
+
+	case ErrCodeItemNotFoundInCart:
+		ErrorResponseExternal(c, result, nil)
 	}
 }
 

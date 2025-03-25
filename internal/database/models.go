@@ -52,6 +52,13 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 	return string(ns.UserRole), nil
 }
 
+type Cart struct {
+	ID        int32
+	UserID    int32
+	ProductID int32
+	Quantity  int32
+}
+
 type Product struct {
 	ID          int32
 	Name        string

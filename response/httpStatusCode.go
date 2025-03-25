@@ -9,6 +9,8 @@ const (
 	ErrCodePasswordNotMatch    = 40004
 	ErrCodeOldPasswordNotMatch = 40005
 	ErrCodeProductNotFound     = 40006
+	ErrCodeQuantityNotEnough   = 40007
+	ErrCodeItemNotFoundInCart  = 40008
 	ErrCodeInternal            = 50000
 )
 
@@ -23,4 +25,6 @@ var msg = map[int]string{
 	ErrCodePasswordNotMatch:    "Password not match",
 	ErrCodeOldPasswordNotMatch: "Old password not match",
 	ErrCodeProductNotFound:     "Product not found",
+	ErrCodeQuantityNotEnough:   "Stock quantity not enough",
+	ErrCodeItemNotFoundInCart:  "Item not found in cart",
 }

@@ -15,6 +15,14 @@ WHERE deleted_at IS NULL
 LIMIT ?
 OFFSET ?;
 
+-- name: GetProductByID :one
+SELECT
+    id, name, description, price, quantity, image_url
+FROM 
+    `product`
+WHERE
+    deleted_at IS NULL AND id = ?;
+
 -- name: UpdateProduct :execresult
 UPDATE `product`
 SET
@@ -29,3 +37,11 @@ WHERE id = ?;
 UPDATE `product`
 SET deleted_at = NOW()
 WHERE id = ?;
+
+-- name: GetQuantity :one
+SELECT
+    quantity
+FROM 
+    `product`
+WHERE 
+    id = ?

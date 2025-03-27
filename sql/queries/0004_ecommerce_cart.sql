@@ -29,3 +29,9 @@ DELETE
 FROM `cart`
 WHERE
     user_id = ? AND id = ?;
+
+-- name: UpdateCart :execresult
+UPDATE `cart`
+SET quantity = ?
+WHERE
+    id = ? AND user_id = ? AND product_id = ?

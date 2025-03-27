@@ -10,5 +10,7 @@ func InitValidator() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("password", validation.ValidatePassword)
 		v.RegisterValidation("name", validation.ValidateName)
+		v.RegisterValidation("phone", validation.ValidatePhone)
+
 	}
 }

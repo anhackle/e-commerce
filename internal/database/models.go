@@ -10,6 +10,94 @@ import (
 	"fmt"
 )
 
+type OrderPaymentMethod string
+
+const (
+	OrderPaymentMethodCOD  OrderPaymentMethod = "COD"
+	OrderPaymentMethodMOMO OrderPaymentMethod = "MOMO"
+	OrderPaymentMethodBANK OrderPaymentMethod = "BANK"
+)
+
+func (e *OrderPaymentMethod) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = OrderPaymentMethod(s)
+	case string:
+		*e = OrderPaymentMethod(s)
+	default:
+		return fmt.Errorf("unsupported scan type for OrderPaymentMethod: %T", src)
+	}
+	return nil
+}
+
+type NullOrderPaymentMethod struct {
+	OrderPaymentMethod OrderPaymentMethod
+	Valid              bool // Valid is true if OrderPaymentMethod is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullOrderPaymentMethod) Scan(value interface{}) error {
+	if value == nil {
+		ns.OrderPaymentMethod, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.OrderPaymentMethod.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullOrderPaymentMethod) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.OrderPaymentMethod), nil
+}
+
+type OrderStatus string
+
+const (
+	OrderStatusCreate  OrderStatus = "create"
+	OrderStatusConfirm OrderStatus = "confirm"
+	OrderStatusPay     OrderStatus = "pay"
+	OrderStatusShip    OrderStatus = "ship"
+	OrderStatusFinish  OrderStatus = "finish"
+)
+
+func (e *OrderStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = OrderStatus(s)
+	case string:
+		*e = OrderStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for OrderStatus: %T", src)
+	}
+	return nil
+}
+
+type NullOrderStatus struct {
+	OrderStatus OrderStatus
+	Valid       bool // Valid is true if OrderStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullOrderStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.OrderStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.OrderStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullOrderStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.OrderStatus), nil
+}
+
 type UserRole string
 
 const (
@@ -57,6 +145,26 @@ type Cart struct {
 	UserID    int32
 	ProductID int32
 	Quantity  int32
+}
+
+type Order struct {
+	ID              int32
+	UserID          int32
+	PaymentMethod   NullOrderPaymentMethod
+	Status          NullOrderStatus
+	CreatedAt       sql.NullTime
+	UpdatedAt       sql.NullTime
+	ShippingAddress sql.NullString
+	Total           int32
+}
+
+type OrderItem struct {
+	ID           int32
+	OrderID      int32
+	ProductID    int32
+	Quantity     int32
+	PresentPrice int32
+	CreatedAt    sql.NullTime
 }
 
 type Product struct {

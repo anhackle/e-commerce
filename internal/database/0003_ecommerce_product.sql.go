@@ -19,6 +19,9 @@ INSERT INTO ` + "`" + `product` + "`" + ` (
     image_url
 )
 VALUES (?, ?, ?, ?, ?)
+ON DUPLICATE KEY 
+UPDATE
+    quantity = quantity  + VALUES(quantity)
 `
 
 type CreateProductParams struct {

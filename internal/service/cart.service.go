@@ -14,11 +14,44 @@ type ICartService interface {
 	AddToCart(ctx context.Context, input model.AddToCartInput) (result int, err error)
 	GetCart(ctx context.Context) (cart []model.GetCartOutput, result int, err error)
 	DeleteCart(ctx context.Context, input model.DeleteCartInput) (result int, err error)
+	UpdateCart(ctx context.Context, input model.UpdateCartInput) (result int, err error)
 }
 
 type cartService struct {
 	cartRepo    repo.ICartRepo
 	productRepo repo.IProductRepo
+}
+
+// UpdateCart implements ICartService.
+func (cs *cartService) UpdateCart(ctx context.Context, input model.UpdateCartInput) (result int, err error) {
+	quantity := *input.Quantity
+	if quantity == 0 {
+		result, err = cs.DeleteCart(ctx, model.DeleteCartInput{
+			ItemID: input.ItemID,
+		})
+		return result, err
+	}
+
+	stockQuantity, err := cs.productRepo.GetQuantity(ctx, input.ProductID)
+	if err != nil {
+		return response.ErrCodeInternal, nil
+	}
+
+	if quantity > int(stockQuantity) {
+		return response.ErrCodeQuantityNotEnough, errors.New("quantity not enough")
+	}
+
+	_, err = cs.cartRepo.UpdateCart(ctx, input)
+	if err != nil && err == sql.ErrNoRows {
+		return response.ErrCodeProductNotFound, err
+	}
+
+	if err != nil && err != sql.ErrNoRows {
+		return response.ErrCodeInternal, err
+	}
+
+	return response.ErrCodeSuccess, nil
+
 }
 
 // DeleteCart implements ICartService.

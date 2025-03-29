@@ -16,5 +16,11 @@ type GetCartOutput struct {
 }
 
 type DeleteCartInput struct {
-	CartID int `json:"cart_id" binding:"required,numeric,min=0"`
+	ItemID int `json:"item_id" binding:"required,numeric,min=0"`
+}
+
+type UpdateCartInput struct {
+	ItemID    int  `json:"item_id" binding:"required,numeric,min=0"`
+	ProductID int  `json:"product_id" binding:"required,numeric,min=0"`
+	Quantity  *int `json:"quantity" binding:"required,numeric,min=0"`
 }

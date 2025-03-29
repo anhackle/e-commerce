@@ -41,6 +41,18 @@ func (cc *CartController) DeleteCart(c *gin.Context) {
 	response.HandleResult(c, result, nil)
 }
 
+func (cc *CartController) UpdateCart(c *gin.Context) {
+	var input model.UpdateCartInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	result, _ := cc.cartService.UpdateCart(c, input)
+
+	response.HandleResult(c, result, nil)
+}
+
 func NewCartController(cartService service.ICartService) *CartController {
 	return &CartController{
 		cartService: cartService,

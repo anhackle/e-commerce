@@ -14,12 +14,3 @@ func ValidatePassword(fl validator.FieldLevel) bool {
 
 	return match
 }
-
-func ValidateName(fl validator.FieldLevel) bool {
-	var namePattern = "^[\\p{L} ]+$"
-
-	name := fl.Field().String()
-	match, _ := regexp.MatchString(namePattern, name)
-
-	return match
-}

@@ -12,17 +12,38 @@ type ICartRepo interface {
 	AddToCart(ctx context.Context, input model.AddToCartInput) (result sql.Result, err error)
 	GetCart(ctx context.Context) (cart []database.GetCartRow, err error)
 	DeleteCart(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error)
+	UpdateCart(ctx context.Context, input model.UpdateCartInput) (result sql.Result, err error)
 }
 
 type cartRepo struct {
 	queries *database.Queries
 }
 
+// UpdateCart implements ICartRepo.
+func (cr *cartRepo) UpdateCart(ctx context.Context, input model.UpdateCartInput) (result sql.Result, err error) {
+	result, err = cr.queries.UpdateCart(ctx, database.UpdateCartParams{
+		ID:        int32(input.ItemID),
+		UserID:    int32(ctx.Value("userID").(int)),
+		ProductID: int32(input.ProductID),
+		Quantity:  int32(*input.Quantity),
+	})
+	if err != nil {
+		return result, err
+	}
+
+	if rows, _ := result.RowsAffected(); rows == 0 {
+		return result, sql.ErrNoRows
+	}
+
+	return result, nil
+
+}
+
 // DeleteCart implements ICartRepo.
 func (cr *cartRepo) DeleteCart(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error) {
 	result, err = cr.queries.DeleteCart(ctx, database.DeleteCartParams{
 		UserID: int32(ctx.Value("userID").(int)),
-		ID:     int32(input.CartID),
+		ID:     int32(input.ItemID),
 	})
 	if err != nil {
 		return result, err

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS product (
     quantity INT NOT NULL,
     image_url TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 -- +goose StatementEnd
 
 -- +goose Down

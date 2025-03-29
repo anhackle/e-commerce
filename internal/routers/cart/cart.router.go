@@ -19,6 +19,7 @@ func (cr *CartRouter) InitCartRouter(router *gin.RouterGroup) {
 		cartRouterPublic.GET("/", cartController.GetCart)
 		cartRouterPublic.POST("/", cartController.AddToCart)
 		cartRouterPublic.DELETE("/", cartController.DeleteCart)
+		cartRouterPublic.PUT("/", cartController.UpdateCart)
 	}
 
 }

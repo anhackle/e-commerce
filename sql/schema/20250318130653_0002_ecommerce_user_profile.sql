@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
     phone_number VARCHAR(15),
     address VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES user(id)
-);
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 -- +goose StatementEnd
 
 -- +goose Down

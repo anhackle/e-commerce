@@ -6,7 +6,10 @@ INSERT INTO `product` (
     quantity,
     image_url
 )
-VALUES (?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?)
+ON DUPLICATE KEY 
+UPDATE
+    quantity = quantity  + VALUES(quantity);
 
 -- name: GetProducts :many
 SELECT id, name, description, price, quantity, image_url

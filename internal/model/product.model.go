@@ -1,17 +1,17 @@
 package model
 
 type CreateProductInput struct {
-	Name        string `json:"name" binding:"required,name,max=255"`
-	Description string `json:"description" binding:"required"`
+	Name        string `json:"name" binding:"required,name,max=255,endsnotwith= ,startsnotwith= "`
+	Description string `json:"description" binding:"required,endsnotwith= ,startsnotwith= "`
 	Price       int    `json:"price" binding:"required,numeric,min=0"`
 	Quantity    int    `json:"quantity" binding:"required,numeric,min=0,max=100"`
 	ImageURL    string `json:"image_url" binding:"required,url"`
 }
 
 type UpdateProductInput struct {
-	ID          int    `json:"id" binding:"required,numeric,min=0"`
-	Name        string `json:"name" binding:"required,name,max=255"`
-	Description string `json:"description" binding:"required"`
+	ID          int    `json:"product_id" binding:"required,numeric,min=0"`
+	Name        string `json:"name" binding:"required,name,max=255,endsnotwith= ,startsnotwith= "`
+	Description string `json:"description" binding:"required,endsnotwith= ,startsnotwith= "`
 	Price       int    `json:"price" binding:"required,numeric,min=0"`
 	Quantity    int    `json:"quantity" binding:"required,numeric,min=0,max=100"`
 	ImageURL    string `json:"image_url" binding:"required,url"`
@@ -24,7 +24,7 @@ type UpdateProductByIDInput struct {
 }
 
 type DeleteProductInput struct {
-	ID int `json:"id" binding:"required,numeric,min=0"`
+	ID int `json:"product_id" binding:"required,numeric,min=0"`
 }
 
 type GetProductInput struct {
@@ -33,10 +33,10 @@ type GetProductInput struct {
 }
 
 type GetProductOutput struct {
-	ID          int    `json:"id"`
+	ID          int    `json:"product_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`
 	Quantity    int    `json:"quantity"`
-	ImageURL    string `json:"imag_url"`
+	ImageURL    string `json:"image_url"`
 }

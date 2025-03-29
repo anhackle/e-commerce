@@ -1,5 +1,5 @@
 -- name: CreateOrder :execresult
-INSERT INTO `order`(
+INSERT INTO `orders`(
     user_id,
     payment_method,
     shipping_address,

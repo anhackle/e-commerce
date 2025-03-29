@@ -112,7 +112,6 @@ func (cs *cartService) GetCart(ctx context.Context) (cart []model.GetCartOutput,
 			Price:     int(item.ProductPrice),
 			Quantity:  int(item.Quantity),
 			ImageURL:  item.ImageUrl,
-			Total:     int(item.Total),
 		})
 	}
 

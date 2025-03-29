@@ -3,7 +3,7 @@ package model
 type CreateOrderInput struct {
 	PaymentMethod   string `json:"payment_method" binding:"required,paymentmethod"`
 	ShippingAddress string `json:"shipping_address" binding:"required"`
-	TotalPrice      int    `json:"total_price"`
+	TotalPrice      int64  `json:"total_price"`
 }
 
 // Internal input => Not need binding

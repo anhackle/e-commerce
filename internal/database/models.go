@@ -10,92 +10,92 @@ import (
 	"fmt"
 )
 
-type OrderPaymentMethod string
+type OrdersPaymentMethod string
 
 const (
-	OrderPaymentMethodCOD  OrderPaymentMethod = "COD"
-	OrderPaymentMethodMOMO OrderPaymentMethod = "MOMO"
-	OrderPaymentMethodBANK OrderPaymentMethod = "BANK"
+	OrdersPaymentMethodCOD  OrdersPaymentMethod = "COD"
+	OrdersPaymentMethodMOMO OrdersPaymentMethod = "MOMO"
+	OrdersPaymentMethodBANK OrdersPaymentMethod = "BANK"
 )
 
-func (e *OrderPaymentMethod) Scan(src interface{}) error {
+func (e *OrdersPaymentMethod) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = OrderPaymentMethod(s)
+		*e = OrdersPaymentMethod(s)
 	case string:
-		*e = OrderPaymentMethod(s)
+		*e = OrdersPaymentMethod(s)
 	default:
-		return fmt.Errorf("unsupported scan type for OrderPaymentMethod: %T", src)
+		return fmt.Errorf("unsupported scan type for OrdersPaymentMethod: %T", src)
 	}
 	return nil
 }
 
-type NullOrderPaymentMethod struct {
-	OrderPaymentMethod OrderPaymentMethod
-	Valid              bool // Valid is true if OrderPaymentMethod is not NULL
+type NullOrdersPaymentMethod struct {
+	OrdersPaymentMethod OrdersPaymentMethod
+	Valid               bool // Valid is true if OrdersPaymentMethod is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullOrderPaymentMethod) Scan(value interface{}) error {
+func (ns *NullOrdersPaymentMethod) Scan(value interface{}) error {
 	if value == nil {
-		ns.OrderPaymentMethod, ns.Valid = "", false
+		ns.OrdersPaymentMethod, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.OrderPaymentMethod.Scan(value)
+	return ns.OrdersPaymentMethod.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullOrderPaymentMethod) Value() (driver.Value, error) {
+func (ns NullOrdersPaymentMethod) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.OrderPaymentMethod), nil
+	return string(ns.OrdersPaymentMethod), nil
 }
 
-type OrderStatus string
+type OrdersStatus string
 
 const (
-	OrderStatusCreate  OrderStatus = "create"
-	OrderStatusConfirm OrderStatus = "confirm"
-	OrderStatusPay     OrderStatus = "pay"
-	OrderStatusShip    OrderStatus = "ship"
-	OrderStatusFinish  OrderStatus = "finish"
+	OrdersStatusCreate  OrdersStatus = "create"
+	OrdersStatusConfirm OrdersStatus = "confirm"
+	OrdersStatusPay     OrdersStatus = "pay"
+	OrdersStatusShip    OrdersStatus = "ship"
+	OrdersStatusFinish  OrdersStatus = "finish"
 )
 
-func (e *OrderStatus) Scan(src interface{}) error {
+func (e *OrdersStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
-		*e = OrderStatus(s)
+		*e = OrdersStatus(s)
 	case string:
-		*e = OrderStatus(s)
+		*e = OrdersStatus(s)
 	default:
-		return fmt.Errorf("unsupported scan type for OrderStatus: %T", src)
+		return fmt.Errorf("unsupported scan type for OrdersStatus: %T", src)
 	}
 	return nil
 }
 
-type NullOrderStatus struct {
-	OrderStatus OrderStatus
-	Valid       bool // Valid is true if OrderStatus is not NULL
+type NullOrdersStatus struct {
+	OrdersStatus OrdersStatus
+	Valid        bool // Valid is true if OrdersStatus is not NULL
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullOrderStatus) Scan(value interface{}) error {
+func (ns *NullOrdersStatus) Scan(value interface{}) error {
 	if value == nil {
-		ns.OrderStatus, ns.Valid = "", false
+		ns.OrdersStatus, ns.Valid = "", false
 		return nil
 	}
 	ns.Valid = true
-	return ns.OrderStatus.Scan(value)
+	return ns.OrdersStatus.Scan(value)
 }
 
 // Value implements the driver Valuer interface.
-func (ns NullOrderStatus) Value() (driver.Value, error) {
+func (ns NullOrdersStatus) Value() (driver.Value, error) {
 	if !ns.Valid {
 		return nil, nil
 	}
-	return string(ns.OrderStatus), nil
+	return string(ns.OrdersStatus), nil
 }
 
 type UserRole string
@@ -150,8 +150,8 @@ type Cart struct {
 type Order struct {
 	ID              int32
 	UserID          int32
-	PaymentMethod   OrderPaymentMethod
-	Status          NullOrderStatus
+	PaymentMethod   OrdersPaymentMethod
+	Status          NullOrdersStatus
 	CreatedAt       sql.NullTime
 	UpdatedAt       sql.NullTime
 	ShippingAddress string

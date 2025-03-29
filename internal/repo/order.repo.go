@@ -48,7 +48,7 @@ func (or *orderRepo) CreateOrderItem(ctx context.Context, input model.CreateOrde
 func (or *orderRepo) CreateOrder(ctx context.Context, input model.CreateOrderInput) (result sql.Result, err error) {
 	result, err = or.queries.CreateOrder(ctx, database.CreateOrderParams{
 		UserID:          int32(ctx.Value("userID").(int)),
-		PaymentMethod:   database.OrderPaymentMethod(input.PaymentMethod),
+		PaymentMethod:   database.OrdersPaymentMethod(input.PaymentMethod),
 		ShippingAddress: input.ShippingAddress,
 		Total:           int64(input.TotalPrice),
 	})

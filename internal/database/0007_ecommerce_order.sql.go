@@ -11,7 +11,7 @@ import (
 )
 
 const createOrder = `-- name: CreateOrder :execresult
-INSERT INTO ` + "`" + `order` + "`" + `(
+INSERT INTO ` + "`" + `orders` + "`" + `(
     user_id,
     payment_method,
     shipping_address,
@@ -22,7 +22,7 @@ VALUES(?, ?, ?, ?)
 
 type CreateOrderParams struct {
 	UserID          int32
-	PaymentMethod   OrderPaymentMethod
+	PaymentMethod   OrdersPaymentMethod
 	ShippingAddress string
 	Total           int64
 }

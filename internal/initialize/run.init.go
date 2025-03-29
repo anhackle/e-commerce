@@ -1,5 +1,11 @@
 package initialize
 
+import (
+	"fmt"
+
+	"github.com/anle/codebase/global"
+)
+
 func Run() {
 	LoadConfig()
 	InitLogger()
@@ -8,6 +14,6 @@ func Run() {
 	InitValidator()
 
 	r := InitRouter()
-	r.Run(":8082")
+	r.Run(fmt.Sprintf(":%d", global.Config.Server.Port))
 
 }

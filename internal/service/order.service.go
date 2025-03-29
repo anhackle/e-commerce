@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"sort"
 
 	"github.com/anle/codebase/internal/database"
 	"github.com/anle/codebase/internal/model"
@@ -50,8 +51,13 @@ func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrder
 		}
 	}()
 
+	//2.1 Sort the cart to prevent deadlock
+	sort.Slice(cart, func(i, j int) bool {
+		return cart[i].ProductID < cart[j].ProductID
+	})
+
 	//3. Check Stock
-	totalPrice := 0
+	var totalPrice int64 = 0
 	products := make(map[int32]database.GetProductByIDForUpdateRow)
 
 	for _, item := range cart {
@@ -71,7 +77,7 @@ func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrder
 			return response.ErrCodeQuantityNotEnough, err
 		}
 
-		totalPrice += int(item.Total)
+		totalPrice += int64(item.Quantity) * item.ProductPrice
 		products[product.ID] = product
 	}
 

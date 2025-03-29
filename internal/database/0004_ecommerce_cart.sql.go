@@ -66,8 +66,7 @@ SELECT
     p.name AS product_name,
     c.quantity AS quantity,
     p.image_url AS image_url,
-    p.price AS product_price,
-    (p.price * c.quantity) AS total
+    p.price AS product_price
 FROM ` + "`" + `cart` + "`" + ` c
 JOIN
     ` + "`" + `product` + "`" + ` p ON c.product_id = p.id
@@ -82,7 +81,6 @@ type GetCartRow struct {
 	Quantity     int32
 	ImageUrl     string
 	ProductPrice int64
-	Total        int32
 }
 
 func (q *Queries) GetCart(ctx context.Context, userID int32) ([]GetCartRow, error) {
@@ -101,7 +99,6 @@ func (q *Queries) GetCart(ctx context.Context, userID int32) ([]GetCartRow, erro
 			&i.Quantity,
 			&i.ImageUrl,
 			&i.ProductPrice,
-			&i.Total,
 		); err != nil {
 			return nil, err
 		}

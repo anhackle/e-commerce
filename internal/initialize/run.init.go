@@ -8,6 +8,6 @@ func Run() {
 	InitValidator()
 
 	r := InitRouter()
-	r.Run(":8083")
+	r.Run(":8082")
 
 }

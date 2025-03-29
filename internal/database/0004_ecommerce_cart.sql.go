@@ -33,19 +33,30 @@ func (q *Queries) AddToCart(ctx context.Context, arg AddToCartParams) (sql.Resul
 }
 
 const deleteCart = `-- name: DeleteCart :execresult
+DELETE 
+FROM ` + "`" + `cart` + "`" + `
+WHERE
+    user_id = ?
+`
+
+func (q *Queries) DeleteCart(ctx context.Context, userID int32) (sql.Result, error) {
+	return q.db.ExecContext(ctx, deleteCart, userID)
+}
+
+const deleteCartByID = `-- name: DeleteCartByID :execresult
 DELETE
 FROM ` + "`" + `cart` + "`" + `
 WHERE
     user_id = ? AND id = ?
 `
 
-type DeleteCartParams struct {
+type DeleteCartByIDParams struct {
 	UserID int32
 	ID     int32
 }
 
-func (q *Queries) DeleteCart(ctx context.Context, arg DeleteCartParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteCart, arg.UserID, arg.ID)
+func (q *Queries) DeleteCartByID(ctx context.Context, arg DeleteCartByIDParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, deleteCartByID, arg.UserID, arg.ID)
 }
 
 const getCart = `-- name: GetCart :many

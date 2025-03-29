@@ -84,6 +84,39 @@ func (q *Queries) GetProductByID(ctx context.Context, id int32) (GetProductByIDR
 	return i, err
 }
 
+const getProductByIDForUpdate = `-- name: GetProductByIDForUpdate :one
+SELECT
+    id, name, description, price, quantity, image_url
+FROM 
+    ` + "`" + `product` + "`" + `
+WHERE
+    deleted_at IS NULL AND id = ?
+FOR UPDATE
+`
+
+type GetProductByIDForUpdateRow struct {
+	ID          int32
+	Name        string
+	Description sql.NullString
+	Price       int64
+	Quantity    int32
+	ImageUrl    string
+}
+
+func (q *Queries) GetProductByIDForUpdate(ctx context.Context, id int32) (GetProductByIDForUpdateRow, error) {
+	row := q.db.QueryRowContext(ctx, getProductByIDForUpdate, id)
+	var i GetProductByIDForUpdateRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Price,
+		&i.Quantity,
+		&i.ImageUrl,
+	)
+	return i, err
+}
+
 const getProducts = `-- name: GetProducts :many
 SELECT id, name, description, price, quantity, image_url
 FROM ` + "`" + `product` + "`" + `
@@ -181,4 +214,21 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (s
 		arg.ImageUrl,
 		arg.ID,
 	)
+}
+
+const updateProductByID = `-- name: UpdateProductByID :execresult
+UPDATE ` + "`" + `product` + "`" + `
+SET
+    quantity = ?
+WHERE
+    id = ?
+`
+
+type UpdateProductByIDParams struct {
+	Quantity int32
+	ID       int32
+}
+
+func (q *Queries) UpdateProductByID(ctx context.Context, arg UpdateProductByIDParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateProductByID, arg.Quantity, arg.ID)
 }

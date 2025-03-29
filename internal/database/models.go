@@ -150,21 +150,23 @@ type Cart struct {
 type Order struct {
 	ID              int32
 	UserID          int32
-	PaymentMethod   NullOrderPaymentMethod
+	PaymentMethod   OrderPaymentMethod
 	Status          NullOrderStatus
 	CreatedAt       sql.NullTime
 	UpdatedAt       sql.NullTime
-	ShippingAddress sql.NullString
-	Total           int32
+	ShippingAddress string
+	Total           int64
 }
 
 type OrderItem struct {
-	ID           int32
-	OrderID      int32
-	ProductID    int32
-	Quantity     int32
-	PresentPrice int32
-	CreatedAt    sql.NullTime
+	ID          int32
+	OrderID     int32
+	Name        string
+	Description sql.NullString
+	Price       int64
+	Quantity    int32
+	ImageUrl    string
+	CreatedAt   sql.NullTime
 }
 
 type Product struct {

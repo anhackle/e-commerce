@@ -3,14 +3,15 @@
 CREATE TABLE IF NOT EXISTS `order_item` (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
     order_id INT NOT NULL,
-    product_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price BIGINT NOT NULL,
     quantity INT NOT NULL,
-    present_price INT NOT NULL,
+    image_url TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (order_id) REFERENCES `order`(id),
-    FOREIGN KEY (product_id) REFERENCES product(id)
-);
+    FOREIGN KEY (order_id) REFERENCES `order`(id)
+)CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 -- +goose StatementEnd
 
 -- +goose Down

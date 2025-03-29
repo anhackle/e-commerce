@@ -27,12 +27,12 @@ type orderService struct {
 func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrderInput) (result int, err error) {
 	//1. Get user's cart
 	cart, err := os.cartRepo.GetCart(ctx)
-	if err == sql.ErrNoRows {
-		return response.ErrCodeCartEmpty, err
-	}
-
 	if err != nil {
 		return response.ErrCodeInternal, err
+	}
+
+	if len(cart) == 0 {
+		return response.ErrCodeCartEmpty, err
 	}
 
 	//2. Create transaction

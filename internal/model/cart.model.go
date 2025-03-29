@@ -6,7 +6,7 @@ type AddToCartInput struct {
 }
 
 type GetCartOutput struct {
-	CartID    int    `json:"cart_id"`
+	CartID    int    `json:"item_id"`
 	ProductID int    `json:"product_id"`
 	Name      string `json:"name"`
 	Price     int    `json:"price"`

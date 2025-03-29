@@ -42,7 +42,7 @@ func (cs *cartService) UpdateCart(ctx context.Context, input model.UpdateCartInp
 	}
 
 	_, err = cs.cartRepo.UpdateCart(ctx, input)
-	if err != nil && err == sql.ErrNoRows {
+	if err == sql.ErrNoRows {
 		return response.ErrCodeProductNotFound, err
 	}
 
@@ -57,7 +57,7 @@ func (cs *cartService) UpdateCart(ctx context.Context, input model.UpdateCartInp
 // DeleteCart implements ICartService.
 func (cs *cartService) DeleteCartByID(ctx context.Context, input model.DeleteCartInput) (result int, err error) {
 	_, err = cs.cartRepo.DeleteCartByID(ctx, input)
-	if err != nil && err == sql.ErrNoRows {
+	if err == sql.ErrNoRows {
 		return response.ErrCodeItemNotFoundInCart, err
 	}
 
@@ -72,7 +72,7 @@ func (cs *cartService) DeleteCartByID(ctx context.Context, input model.DeleteCar
 func (cs *cartService) AddToCart(ctx context.Context, input model.AddToCartInput) (result int, err error) {
 	_, err = cs.productRepo.GetProductByID(ctx, input.ProductID)
 
-	if err != nil && err == sql.ErrNoRows {
+	if err == sql.ErrNoRows {
 		return response.ErrCodeProductNotFound, err
 	}
 

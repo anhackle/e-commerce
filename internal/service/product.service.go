@@ -23,7 +23,7 @@ type productService struct {
 // DeleteProduct implements IProductService.
 func (ps *productService) DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result int, err error) {
 	_, err = ps.productRepo.DeleteProduct(ctx, input)
-	if err != nil && err == sql.ErrNoRows {
+	if err == sql.ErrNoRows {
 		return response.ErrCodeProductNotFound, err
 	}
 
@@ -37,7 +37,7 @@ func (ps *productService) DeleteProduct(ctx context.Context, input model.DeleteP
 // UpdateProduct implements IProductService.
 func (ps *productService) UpdateProduct(ctx context.Context, input model.UpdateProductInput) (result int, err error) {
 	_, err = ps.productRepo.UpdateProduct(ctx, input)
-	if err != nil && err == sql.ErrNoRows {
+	if err == sql.ErrNoRows {
 		return response.ErrCodeProductNotFound, err
 	}
 

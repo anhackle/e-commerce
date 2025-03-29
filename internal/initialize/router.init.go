@@ -22,6 +22,7 @@ func InitRouter() *gin.Engine {
 	userRouter := routers.RouterGroupApp.User
 	productRouter := routers.RouterGroupApp.Product
 	cartRouter := routers.RouterGroupApp.Cart
+	orderRouter := routers.RouterGroupApp.Order
 
 	MainGroup := r.Group("/v1")
 	MainGroup.Use(middlewares.CORSMiddleware())
@@ -31,6 +32,7 @@ func InitRouter() *gin.Engine {
 		userRouter.InitUserRouter(MainGroup)
 		productRouter.InitProductRouter(MainGroup)
 		cartRouter.InitCartRouter(MainGroup)
+		orderRouter.InitOrderRouter(MainGroup)
 	}
 
 	return r

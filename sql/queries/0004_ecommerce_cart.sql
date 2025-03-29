@@ -24,11 +24,17 @@ JOIN
 WHERE
     c.user_id = ?;
 
--- name: DeleteCart :execresult
+-- name: DeleteCartByID :execresult
 DELETE
 FROM `cart`
 WHERE
     user_id = ? AND id = ?;
+
+-- name: DeleteCart :execresult
+DELETE 
+FROM `cart`
+WHERE
+    user_id = ?;
 
 -- name: UpdateCart :execresult
 UPDATE `cart`

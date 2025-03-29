@@ -17,6 +17,12 @@ type UpdateProductInput struct {
 	ImageURL    string `json:"image_url" binding:"required,url"`
 }
 
+// Internal input => Not need binding
+type UpdateProductByIDInput struct {
+	ID       int
+	Quantity int
+}
+
 type DeleteProductInput struct {
 	ID int `json:"id" binding:"required,numeric,min=0"`
 }

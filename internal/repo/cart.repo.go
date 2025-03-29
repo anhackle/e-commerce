@@ -11,12 +11,31 @@ import (
 type ICartRepo interface {
 	AddToCart(ctx context.Context, input model.AddToCartInput) (result sql.Result, err error)
 	GetCart(ctx context.Context) (cart []database.GetCartRow, err error)
-	DeleteCart(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error)
+	DeleteCartByID(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error)
+	DeleteCart(ctx context.Context) (result sql.Result, err error)
 	UpdateCart(ctx context.Context, input model.UpdateCartInput) (result sql.Result, err error)
+	WithTx(tx *sql.Tx) ICartRepo
 }
 
 type cartRepo struct {
 	queries *database.Queries
+}
+
+// DeleteCart implements ICartRepo.
+func (cr *cartRepo) DeleteCart(ctx context.Context) (result sql.Result, err error) {
+	result, err = cr.queries.DeleteCart(ctx, int32(ctx.Value("userID").(int)))
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+// WithTx implements ICartRepo.
+func (cr *cartRepo) WithTx(tx *sql.Tx) ICartRepo {
+	return &cartRepo{
+		queries: cr.queries.WithTx(tx),
+	}
 }
 
 // UpdateCart implements ICartRepo.
@@ -40,8 +59,8 @@ func (cr *cartRepo) UpdateCart(ctx context.Context, input model.UpdateCartInput)
 }
 
 // DeleteCart implements ICartRepo.
-func (cr *cartRepo) DeleteCart(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error) {
-	result, err = cr.queries.DeleteCart(ctx, database.DeleteCartParams{
+func (cr *cartRepo) DeleteCartByID(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error) {
+	result, err = cr.queries.DeleteCartByID(ctx, database.DeleteCartByIDParams{
 		UserID: int32(ctx.Value("userID").(int)),
 		ID:     int32(input.ItemID),
 	})

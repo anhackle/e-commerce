@@ -46,6 +46,9 @@ func HandleResult(c *gin.Context, result int, data any) {
 
 	case ErrCodeItemNotFoundInCart:
 		ErrorResponseExternal(c, result, nil)
+
+	case ErrCodeCartEmpty:
+		ErrorResponseExternal(c, result, nil)
 	}
 }
 

@@ -11,14 +11,47 @@ import (
 type IProductRepo interface {
 	CreateProduct(ctx context.Context, input model.CreateProductInput) (result sql.Result, err error)
 	UpdateProduct(ctx context.Context, input model.UpdateProductInput) (result sql.Result, err error)
+	UpdateProductByID(ctx context.Context, input model.UpdateProductByIDInput) (result sql.Result, err error)
 	DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result sql.Result, err error)
 	GetProducts(ctx context.Context, input model.GetProductInput) (products []database.GetProductsRow, err error)
 	GetProductByID(ctx context.Context, productID int) (product database.GetProductByIDRow, err error)
+	GetProductByIDForUpdate(ctx context.Context, productID int) (product database.GetProductByIDForUpdateRow, err error)
 	GetQuantity(ctx context.Context, productID int) (quantity int32, err error)
+	WithTx(tx *sql.Tx) IProductRepo
 }
 
 type productRepo struct {
 	queries *database.Queries
+}
+
+// UpdateProductByID implements IProductRepo.
+func (pr *productRepo) UpdateProductByID(ctx context.Context, input model.UpdateProductByIDInput) (result sql.Result, err error) {
+	result, err = pr.queries.UpdateProductByID(ctx, database.UpdateProductByIDParams{
+		ID:       int32(input.ID),
+		Quantity: int32(input.Quantity),
+	})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+// WithTx implements IProductRepo.
+func (pr *productRepo) WithTx(tx *sql.Tx) IProductRepo {
+	return &productRepo{
+		queries: pr.queries.WithTx(tx),
+	}
+}
+
+// GetProductByIDForUpdate implements IProductRepo.
+func (pr *productRepo) GetProductByIDForUpdate(ctx context.Context, productID int) (product database.GetProductByIDForUpdateRow, err error) {
+	product, err = pr.queries.GetProductByIDForUpdate(ctx, int32(productID))
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
 }
 
 // GetProductByID implements IProductRepo.

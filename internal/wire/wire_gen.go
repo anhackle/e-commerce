@@ -32,6 +32,17 @@ func InitCartRouterHandler(dbc *sql.DB) (*controller.CartController, error) {
 	return cartController, nil
 }
 
+// Injectors from order.wire.go:
+
+func InitOrderRouterHandler(dbc *sql.DB) (*controller.OrderController, error) {
+	iOrderRepo := repo.NewOrderRepo(dbc)
+	iCartRepo := repo.NewCartRepo(dbc)
+	iProductRepo := repo.NewProductRepo(dbc)
+	iOrderService := service.NewOrderService(dbc, iOrderRepo, iCartRepo, iProductRepo)
+	orderController := controller.NewOrderController(iOrderService)
+	return orderController, nil
+}
+
 // Injectors from product.wire.go:
 
 func InitProductRouterHandler(dbc *sql.DB) (*controller.ProductController, error) {

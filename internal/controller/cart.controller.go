@@ -36,7 +36,7 @@ func (cc *CartController) DeleteCart(c *gin.Context) {
 		return
 	}
 
-	result, _ := cc.cartService.DeleteCart(c, input)
+	result, _ := cc.cartService.DeleteCartByID(c, input)
 
 	response.HandleResult(c, result, nil)
 }

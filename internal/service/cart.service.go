@@ -13,7 +13,7 @@ import (
 type ICartService interface {
 	AddToCart(ctx context.Context, input model.AddToCartInput) (result int, err error)
 	GetCart(ctx context.Context) (cart []model.GetCartOutput, result int, err error)
-	DeleteCart(ctx context.Context, input model.DeleteCartInput) (result int, err error)
+	DeleteCartByID(ctx context.Context, input model.DeleteCartInput) (result int, err error)
 	UpdateCart(ctx context.Context, input model.UpdateCartInput) (result int, err error)
 }
 
@@ -26,7 +26,7 @@ type cartService struct {
 func (cs *cartService) UpdateCart(ctx context.Context, input model.UpdateCartInput) (result int, err error) {
 	quantity := *input.Quantity
 	if quantity == 0 {
-		result, err = cs.DeleteCart(ctx, model.DeleteCartInput{
+		result, err = cs.DeleteCartByID(ctx, model.DeleteCartInput{
 			ItemID: input.ItemID,
 		})
 		return result, err
@@ -55,8 +55,8 @@ func (cs *cartService) UpdateCart(ctx context.Context, input model.UpdateCartInp
 }
 
 // DeleteCart implements ICartService.
-func (cs *cartService) DeleteCart(ctx context.Context, input model.DeleteCartInput) (result int, err error) {
-	_, err = cs.cartRepo.DeleteCart(ctx, input)
+func (cs *cartService) DeleteCartByID(ctx context.Context, input model.DeleteCartInput) (result int, err error) {
+	_, err = cs.cartRepo.DeleteCartByID(ctx, input)
 	if err != nil && err == sql.ErrNoRows {
 		return response.ErrCodeItemNotFoundInCart, err
 	}

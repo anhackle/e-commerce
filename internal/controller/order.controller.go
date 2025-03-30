@@ -47,6 +47,30 @@ func (oc *OrderController) GetOrder(c *gin.Context) {
 	response.HandleResult(c, result, orderDetail)
 }
 
+func (oc *OrderController) UpdateStatus(c *gin.Context) {
+	var input model.UpdateStatusInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	result, _ := oc.orderService.UpdateStatus(c, input)
+
+	response.HandleResult(c, result, nil)
+}
+
+func (oc *OrderController) GetOrdersForAdmin(c *gin.Context) {
+	var input model.GetOrdersForAdminInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	orders, result, _ := oc.orderService.GetOrdersForAdmin(c, input)
+
+	response.HandleResult(c, result, orders)
+}
+
 func NewOrderController(orderService service.IOrderService) *OrderController {
 	return &OrderController{
 		orderService: orderService,

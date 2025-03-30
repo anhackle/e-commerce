@@ -52,6 +52,9 @@ func HandleResult(c *gin.Context, result int, data any) {
 
 	case ErrCodeOrderNotFound:
 		ErrorResponseExternal(c, result, nil)
+
+	case ErrCodeStatusNotValid:
+		ErrorResponseExternal(c, result, nil)
 	}
 }
 

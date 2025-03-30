@@ -9,15 +9,53 @@ import (
 )
 
 type IOrderRepo interface {
-	GetOrder(ctx context.Context) (err error)
+	GetOrders(ctx context.Context, input model.GetOrdersInput) (result []database.GetOrdersRow, err error)
+	GetOrder(ctx context.Context, input model.GetOrderInput) (result database.GetOrderRow, err error)
+	GetOrderItems(ctx context.Context, orderID int) (result []database.GetOrderItemsRow, err error)
 	CreateOrder(ctx context.Context, input model.CreateOrderInput) (result sql.Result, err error)
 	CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (result sql.Result, err error)
-	DeleteOrder(ctx context.Context) (err error)
 	WithTx(tx *sql.Tx) IOrderRepo
 }
 
 type orderRepo struct {
 	queries *database.Queries
+}
+
+// GetOrderItem implements IOrderRepo.
+func (or *orderRepo) GetOrderItems(ctx context.Context, orderID int) (result []database.GetOrderItemsRow, err error) {
+	result, err = or.queries.GetOrderItems(ctx, int32(orderID))
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+// GetOrder implements IOrderRepo.
+func (or *orderRepo) GetOrder(ctx context.Context, input model.GetOrderInput) (result database.GetOrderRow, err error) {
+	result, err = or.queries.GetOrder(ctx, database.GetOrderParams{
+		ID:     int32(input.OrderID),
+		UserID: int32(ctx.Value("userID").(int)),
+	})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+// GetOrders implements IOrderRepo.
+func (or *orderRepo) GetOrders(ctx context.Context, input model.GetOrdersInput) (result []database.GetOrdersRow, err error) {
+	result, err = or.queries.GetOrders(ctx, database.GetOrdersParams{
+		UserID: int32(ctx.Value("userID").(int)),
+		Limit:  int32(input.Limit),
+		Offset: int32(input.Page),
+	})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }
 
 // WithTx implements IOrderRepo.
@@ -57,16 +95,6 @@ func (or *orderRepo) CreateOrder(ctx context.Context, input model.CreateOrderInp
 	}
 
 	return result, nil
-}
-
-// DeleteOrder implements IOrderRepo.
-func (or *orderRepo) DeleteOrder(ctx context.Context) (err error) {
-	panic("unimplemented")
-}
-
-// GetOrder implements IOrderRepo.
-func (or *orderRepo) GetOrder(ctx context.Context) (err error) {
-	panic("unimplemented")
 }
 
 func NewOrderRepo(dbConn *sql.DB) IOrderRepo {

@@ -16,9 +16,9 @@ func (cr *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 	orderRouterPublic.Use(middlewares.JWTMiddleware())
 
 	{
-		orderRouterPublic.GET("/", orderController.GetOrder)
+		orderRouterPublic.GET("/", orderController.GetOrders)
+		orderRouterPublic.POST("/search", orderController.GetOrder)
 		orderRouterPublic.POST("/", orderController.CreateOrder)
-		orderRouterPublic.DELETE("/", orderController.DeleteOrder)
 	}
 
 }

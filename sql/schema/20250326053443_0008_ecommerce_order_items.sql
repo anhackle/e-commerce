@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `order_item` (
     image_url TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (order_id) REFERENCES `order`(id)
+    FOREIGN KEY (order_id) REFERENCES `orders`(id)
 )CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 -- +goose StatementEnd
 

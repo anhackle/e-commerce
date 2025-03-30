@@ -12,6 +12,7 @@ const (
 	ErrCodeQuantityNotEnough   = 40007
 	ErrCodeItemNotFoundInCart  = 40008
 	ErrCodeCartEmpty           = 40009
+	ErrCodeOrderNotFound       = 40010
 	ErrCodeInternal            = 50000
 )
 
@@ -29,4 +30,5 @@ var msg = map[int]string{
 	ErrCodeQuantityNotEnough:   "Stock quantity not enough",
 	ErrCodeItemNotFoundInCart:  "Item not found in cart",
 	ErrCodeCartEmpty:           "Cart is empty",
+	ErrCodeOrderNotFound:       "Order not found",
 }

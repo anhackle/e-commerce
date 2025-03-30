@@ -35,3 +35,102 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (sql.R
 		arg.Total,
 	)
 }
+
+const getOrder = `-- name: GetOrder :one
+SELECT
+    id,
+    created_at,
+    status,
+    shipping_address,
+    payment_method,
+    total
+FROM ` + "`" + `orders` + "`" + `
+WHERE id = ? AND user_id = ?
+`
+
+type GetOrderParams struct {
+	ID     int32
+	UserID int32
+}
+
+type GetOrderRow struct {
+	ID              int32
+	CreatedAt       sql.NullTime
+	Status          NullOrdersStatus
+	ShippingAddress string
+	PaymentMethod   OrdersPaymentMethod
+	Total           int64
+}
+
+func (q *Queries) GetOrder(ctx context.Context, arg GetOrderParams) (GetOrderRow, error) {
+	row := q.db.QueryRowContext(ctx, getOrder, arg.ID, arg.UserID)
+	var i GetOrderRow
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.Status,
+		&i.ShippingAddress,
+		&i.PaymentMethod,
+		&i.Total,
+	)
+	return i, err
+}
+
+const getOrders = `-- name: GetOrders :many
+SELECT 
+    id,
+    created_at,
+    status,
+    shipping_address,
+    payment_method,
+    total
+FROM orders
+WHERE user_id = ?
+LIMIT ?
+OFFSET ?
+`
+
+type GetOrdersParams struct {
+	UserID int32
+	Limit  int32
+	Offset int32
+}
+
+type GetOrdersRow struct {
+	ID              int32
+	CreatedAt       sql.NullTime
+	Status          NullOrdersStatus
+	ShippingAddress string
+	PaymentMethod   OrdersPaymentMethod
+	Total           int64
+}
+
+func (q *Queries) GetOrders(ctx context.Context, arg GetOrdersParams) ([]GetOrdersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOrders, arg.UserID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOrdersRow
+	for rows.Next() {
+		var i GetOrdersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.Status,
+			&i.ShippingAddress,
+			&i.PaymentMethod,
+			&i.Total,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

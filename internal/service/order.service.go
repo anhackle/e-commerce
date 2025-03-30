@@ -12,9 +12,9 @@ import (
 )
 
 type IOrderService interface {
-	GetOrder(ctx context.Context) (result int, err error)
+	GetOrders(ctx context.Context, input model.GetOrdersInput) (orders []model.GetOrdersOutput, result int, err error)
 	CreateOrder(ctx context.Context, input model.CreateOrderInput) (result int, err error)
-	DeleteOrder(ctx context.Context) (result int, err error)
+	GetOrder(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error)
 }
 
 type orderService struct {
@@ -22,6 +22,31 @@ type orderService struct {
 	cartRepo    repo.ICartRepo
 	productRepo repo.IProductRepo
 	orderRepo   repo.IOrderRepo
+}
+
+// GetOrders implements IOrderService.
+func (os *orderService) GetOrders(ctx context.Context, input model.GetOrdersInput) (orders []model.GetOrdersOutput, result int, err error) {
+	var getOrdersInput = model.GetOrdersInput{
+		Page:  (input.Page - 1) * input.Limit,
+		Limit: input.Limit,
+	}
+	ordersRepo, err := os.orderRepo.GetOrders(ctx, getOrdersInput)
+	if err != nil {
+		return orders, response.ErrCodeInternal, err
+	}
+
+	for _, order := range ordersRepo {
+		orders = append(orders, model.GetOrdersOutput{
+			OrderID:          int(order.ID),
+			CreatedAt:        order.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+			Status:           string(order.Status.OrdersStatus),
+			ShippingAddreess: order.ShippingAddress,
+			Payment_method:   string(order.PaymentMethod),
+			Total:            order.Total,
+		})
+	}
+
+	return orders, response.ErrCodeSuccess, nil
 }
 
 // CreateOrder implements IOrderService.
@@ -135,14 +160,39 @@ func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrder
 	return response.ErrCodeSuccess, err
 }
 
-// DeleteOrder implements IOrderService.
-func (os *orderService) DeleteOrder(ctx context.Context) (result int, err error) {
-	panic("unimplemented")
-}
-
 // GetOrder implements IOrderService.
-func (os *orderService) GetOrder(ctx context.Context) (result int, err error) {
-	panic("unimplemented")
+func (os *orderService) GetOrder(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error) {
+	order, err := os.orderRepo.GetOrder(ctx, input)
+	if err == sql.ErrNoRows {
+		return orderDetail, response.ErrCodeOrderNotFound, err
+	}
+
+	if err != nil {
+		return orderDetail, response.ErrCodeInternal, err
+	}
+
+	items, err := os.orderRepo.GetOrderItems(ctx, int(order.ID))
+	if err != nil {
+		return orderDetail, response.ErrCodeInternal, err
+	}
+
+	for _, item := range items {
+		orderDetail.OrderID = int(order.ID)
+		orderDetail.CreatedAt = order.CreatedAt.Time.Format("2006-01-02 15:04:05")
+		orderDetail.Status = string(order.Status.OrdersStatus)
+		orderDetail.ShippingAddreess = order.ShippingAddress
+		orderDetail.Payment_method = string(order.PaymentMethod)
+		orderDetail.Total = order.Total
+		orderDetail.Items = append(orderDetail.Items, model.GetOrderItemsOutput{
+			Name:        item.Name,
+			Description: item.Description.String,
+			Price:       item.Price,
+			Quantity:    int(item.Quantity),
+			Image_url:   item.ImageUrl,
+		})
+	}
+
+	return orderDetail, response.ErrCodeSuccess, nil
 }
 
 func NewOrderService(db *sql.DB, orderRepo repo.IOrderRepo, cartRepo repo.ICartRepo, productRepo repo.IProductRepo) IOrderService {

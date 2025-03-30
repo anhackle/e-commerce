@@ -134,3 +134,103 @@ func (q *Queries) GetOrders(ctx context.Context, arg GetOrdersParams) ([]GetOrde
 	}
 	return items, nil
 }
+
+const getOrdersForAdmin = `-- name: GetOrdersForAdmin :many
+SELECT
+    o.user_id AS user_id,
+    o.id AS order_id,
+    up.first_name AS first_name,
+    up.last_name AS last_name,
+    up.phone_number AS phone_number,
+    o.created_at AS created_at,
+    o.status AS status,
+    o.shipping_address AS shipping_address,
+    o.payment_method AS payment_method,
+    o.total AS total
+FROM ` + "`" + `orders` + "`" + ` o
+JOIN ` + "`" + `user` + "`" + ` u  ON o.user_id = u.id
+JOIN ` + "`" + `user_profile` + "`" + ` up ON u.id = up.user_id
+WHERE 
+    o.status = IF(? = '', o.status, ?) AND 
+    o.payment_method = IF(? = '', o.payment_method, ?)
+LIMIT ?
+OFFSET ?
+`
+
+type GetOrdersForAdminParams struct {
+	Column1 interface{}
+	IF      interface{}
+	Column3 interface{}
+	IF_2    interface{}
+	Limit   int32
+	Offset  int32
+}
+
+type GetOrdersForAdminRow struct {
+	UserID          int32
+	OrderID         int32
+	FirstName       sql.NullString
+	LastName        sql.NullString
+	PhoneNumber     sql.NullString
+	CreatedAt       sql.NullTime
+	Status          NullOrdersStatus
+	ShippingAddress string
+	PaymentMethod   OrdersPaymentMethod
+	Total           int64
+}
+
+func (q *Queries) GetOrdersForAdmin(ctx context.Context, arg GetOrdersForAdminParams) ([]GetOrdersForAdminRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOrdersForAdmin,
+		arg.Column1,
+		arg.IF,
+		arg.Column3,
+		arg.IF_2,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOrdersForAdminRow
+	for rows.Next() {
+		var i GetOrdersForAdminRow
+		if err := rows.Scan(
+			&i.UserID,
+			&i.OrderID,
+			&i.FirstName,
+			&i.LastName,
+			&i.PhoneNumber,
+			&i.CreatedAt,
+			&i.Status,
+			&i.ShippingAddress,
+			&i.PaymentMethod,
+			&i.Total,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateStatus = `-- name: UpdateStatus :execresult
+UPDATE ` + "`" + `orders` + "`" + `
+SET status = ?
+WHERE id = ?
+`
+
+type UpdateStatusParams struct {
+	Status NullOrdersStatus
+	ID     int32
+}
+
+func (q *Queries) UpdateStatus(ctx context.Context, arg UpdateStatusParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateStatus, arg.Status, arg.ID)
+}

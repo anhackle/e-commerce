@@ -15,6 +15,8 @@ type IOrderService interface {
 	GetOrders(ctx context.Context, input model.GetOrdersInput) (orders []model.GetOrdersOutput, result int, err error)
 	CreateOrder(ctx context.Context, input model.CreateOrderInput) (result int, err error)
 	GetOrder(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error)
+	UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result int, err error)
+	GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (orders []model.GetOrdersForAdminOutput, result int, err error)
 }
 
 type orderService struct {
@@ -22,6 +24,61 @@ type orderService struct {
 	cartRepo    repo.ICartRepo
 	productRepo repo.IProductRepo
 	orderRepo   repo.IOrderRepo
+}
+
+// GetOrdersForAdmin implements IOrderService.
+func (os *orderService) GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (orders []model.GetOrdersForAdminOutput, result int, err error) {
+	input.Page = (input.Page - 1) * input.Limit
+	ordersRepo, err := os.orderRepo.GetOrdersForAdmin(ctx, input)
+	if err != nil {
+		return orders, response.ErrCodeInternal, err
+	}
+
+	for _, order := range ordersRepo {
+		orders = append(orders, model.GetOrdersForAdminOutput{
+			FirstName:        order.FirstName.String,
+			LastName:         order.LastName.String,
+			PhoneNumber:      order.PhoneNumber.String,
+			CreatedAt:        order.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+			Status:           string(order.Status.OrdersStatus),
+			ShippingAddreess: order.ShippingAddress,
+			Payment_method:   string(order.PaymentMethod),
+			Total:            order.Total,
+		})
+	}
+
+	return orders, response.ErrCodeSuccess, nil
+}
+
+// UpdateStatus implements IOrderService.
+func (os *orderService) UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result int, err error) {
+	status := map[string]string{
+		"create":  "confirm",
+		"confirm": "pay",
+		"pay":     "ship",
+		"ship":    "finish",
+	}
+	order, err := os.orderRepo.GetOrder(ctx, model.GetOrderInput{
+		OrderID: input.OrderID,
+	})
+	if err == sql.ErrNoRows {
+		return response.ErrCodeOrderNotFound, err
+	}
+
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	if input.Status != status[string(order.Status.OrdersStatus)] {
+		return response.ErrCodeStatusNotValid, err
+	}
+
+	_, err = os.orderRepo.UpdateStatus(ctx, input)
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	return response.ErrCodeSuccess, nil
 }
 
 // GetOrders implements IOrderService.

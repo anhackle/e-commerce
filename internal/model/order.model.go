@@ -2,7 +2,7 @@ package model
 
 type CreateOrderInput struct {
 	PaymentMethod   string `json:"payment_method" binding:"required,paymentmethod"`
-	ShippingAddress string `json:"shipping_address" binding:"required"`
+	ShippingAddress string `json:"shipping_address" binding:"required,endsnotwith= ,startsnotwith= "`
 	TotalPrice      int64  `json:"total_price"`
 }
 
@@ -50,4 +50,27 @@ type GetOrderItemsOutput struct {
 	Price       int64
 	Quantity    int
 	Image_url   string
+}
+
+type UpdateStatusInput struct {
+	OrderID int    `json:"order_id" binding:"required,numeric,min=0"`
+	Status  string `json:"status" binding:"required,status"`
+}
+
+type GetOrdersForAdminInput struct {
+	Limit          int    `json:"limit" binding:"required,numeric,max=20,gt=0"`
+	Page           int    `json:"page" binding:"required,numeric,gt=0"`
+	Status         string `json:"status"`
+	Payment_method string `json:"payment_method"`
+}
+
+type GetOrdersForAdminOutput struct {
+	FirstName        string `json:"first_name"`
+	LastName         string `json:"last_name"`
+	PhoneNumber      string `json:"phone_number"`
+	CreatedAt        string `json:"created_at"`
+	Status           string `json:"status"`
+	ShippingAddreess string `json:"shipping_address"`
+	Payment_method   string `json:"payment_method"`
+	Total            int64  `json:"total"`
 }

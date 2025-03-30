@@ -14,11 +14,43 @@ type IOrderRepo interface {
 	GetOrderItems(ctx context.Context, orderID int) (result []database.GetOrderItemsRow, err error)
 	CreateOrder(ctx context.Context, input model.CreateOrderInput) (result sql.Result, err error)
 	CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (result sql.Result, err error)
+	UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result sql.Result, err error)
+	GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (result []database.GetOrdersForAdminRow, err error)
 	WithTx(tx *sql.Tx) IOrderRepo
 }
 
 type orderRepo struct {
 	queries *database.Queries
+}
+
+// GetOrdersForAdmin implements IOrderRepo.
+func (or *orderRepo) GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (result []database.GetOrdersForAdminRow, err error) {
+	result, err = or.queries.GetOrdersForAdmin(ctx, database.GetOrdersForAdminParams{
+		Limit:   int32(input.Limit),
+		Offset:  int32(input.Page),
+		Column1: input.Status,
+		IF:      input.Status,
+		Column3: input.Payment_method,
+		IF_2:    input.Payment_method,
+	})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+// UpdateStatus implements IOrderRepo.
+func (or *orderRepo) UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result sql.Result, err error) {
+	result, err = or.queries.UpdateStatus(ctx, database.UpdateStatusParams{
+		ID:     int32(input.OrderID),
+		Status: database.NullOrdersStatus{OrdersStatus: database.OrdersStatus(input.Status), Valid: input.Status != ""},
+	})
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }
 
 // GetOrderItem implements IOrderRepo.

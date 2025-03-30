@@ -21,4 +21,13 @@ func (cr *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 		orderRouterPublic.POST("/", orderController.CreateOrder)
 	}
 
+	orderRouterPrivate := router.Group("/admin/orders")
+	orderRouterPrivate.Use(middlewares.JWTMiddleware())
+	orderRouterPrivate.Use(middlewares.RoleVerifyMiddleware())
+
+	{
+		orderRouterPrivate.PUT("/status", orderController.UpdateStatus)
+		orderRouterPrivate.POST("/", orderController.GetOrdersForAdmin)
+	}
+
 }

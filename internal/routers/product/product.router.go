@@ -18,7 +18,7 @@ func (pr *ProductRouter) InitProductRouter(router *gin.RouterGroup) {
 		productRouterPublic.POST("/search", productController.GetProducts)
 	}
 
-	productRouterPrivate := router.Group("/products")
+	productRouterPrivate := router.Group("/admin/products")
 	productRouterPrivate.Use(middlewares.JWTMiddleware())
 	productRouterPrivate.Use(middlewares.RoleVerifyMiddleware())
 

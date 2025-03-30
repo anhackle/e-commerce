@@ -7,10 +7,10 @@ import (
 )
 
 func ValidatePaymentMethod(fl validator.FieldLevel) bool {
-	var passwordPattern = "^(MOMO|BANK|COD)$"
+	var paymentPattern = "^(MOMO|BANK|COD)$"
 
-	password := fl.Field().String()
-	match, _ := regexp.MatchString(passwordPattern, password)
+	payment := fl.Field().String()
+	match, _ := regexp.MatchString(paymentPattern, payment)
 
 	return match
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func ValidateStatus(fl validator.FieldLevel) bool {
-	var statusPattern = `^(create|confirm|pay|ship|finish)$`
+	var statusPattern = `^(pending|paid|processing|shipped|delivered|cancelled|failed)$`
 
 	status := fl.Field().String()
 	match, _ := regexp.MatchString(statusPattern, status)

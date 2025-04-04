@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
     user_id INT NOT NULL,
     payment_method ENUM("COD", "MOMO", "BANK") NOT NULL,
-    status ENUM("create", "confirm", "pay", "ship", "finish") DEFAULT "create",
+    status ENUM("pending", "paid", "processing", "shipped", "delivered", "cancelled", "failed") DEFAULT "pending",
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     shipping_address TEXT NOT NULL,

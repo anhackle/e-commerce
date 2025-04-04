@@ -19,9 +19,6 @@ INSERT INTO ` + "`" + `product` + "`" + ` (
     image_url
 )
 VALUES (?, ?, ?, ?, ?)
-ON DUPLICATE KEY 
-UPDATE
-    quantity = quantity  + VALUES(quantity)
 `
 
 type CreateProductParams struct {
@@ -114,6 +111,30 @@ func (q *Queries) GetProductByIDForUpdate(ctx context.Context, id int32) (GetPro
 		&i.Quantity,
 		&i.ImageUrl,
 	)
+	return i, err
+}
+
+const getProductForCreate = `-- name: GetProductForCreate :one
+SELECT id, quantity, deleted_at
+FROM ` + "`" + `product` + "`" + `
+WHERE name = ? AND price = ?
+`
+
+type GetProductForCreateParams struct {
+	Name  string
+	Price int64
+}
+
+type GetProductForCreateRow struct {
+	ID        int32
+	Quantity  int32
+	DeletedAt sql.NullTime
+}
+
+func (q *Queries) GetProductForCreate(ctx context.Context, arg GetProductForCreateParams) (GetProductForCreateRow, error) {
+	row := q.db.QueryRowContext(ctx, getProductForCreate, arg.Name, arg.Price)
+	var i GetProductForCreateRow
+	err := row.Scan(&i.ID, &i.Quantity, &i.DeletedAt)
 	return i, err
 }
 
@@ -216,7 +237,18 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (s
 	)
 }
 
-const updateProductByID = `-- name: UpdateProductByID :execresult
+const updateProductStatus = `-- name: UpdateProductStatus :execresult
+UPDATE ` + "`" + `product` + "`" + `
+SET
+    deleted_at = NULL
+WHERE id = ? AND deleted_at IS NOT NULL
+`
+
+func (q *Queries) UpdateProductStatus(ctx context.Context, id int32) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateProductStatus, id)
+}
+
+const updateQuantity = `-- name: UpdateQuantity :execresult
 UPDATE ` + "`" + `product` + "`" + `
 SET
     quantity = ?
@@ -224,11 +256,11 @@ WHERE
     id = ? AND deleted_at IS NULL
 `
 
-type UpdateProductByIDParams struct {
+type UpdateQuantityParams struct {
 	Quantity int32
 	ID       int32
 }
 
-func (q *Queries) UpdateProductByID(ctx context.Context, arg UpdateProductByIDParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updateProductByID, arg.Quantity, arg.ID)
+func (q *Queries) UpdateQuantity(ctx context.Context, arg UpdateQuantityParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateQuantity, arg.Quantity, arg.ID)
 }

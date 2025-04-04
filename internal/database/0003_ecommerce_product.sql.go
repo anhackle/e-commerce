@@ -45,7 +45,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (s
 const deleteProduct = `-- name: DeleteProduct :execresult
 UPDATE ` + "`" + `product` + "`" + `
 SET deleted_at = NOW()
-WHERE id = ?
+WHERE id = ? AND deleted_at is NULL
 `
 
 func (q *Queries) DeleteProduct(ctx context.Context, id int32) (sql.Result, error) {
@@ -58,7 +58,7 @@ SELECT
 FROM 
     ` + "`" + `product` + "`" + `
 WHERE
-    deleted_at IS NULL AND id = ?
+    id = ? AND deleted_at IS NULL
 `
 
 type GetProductByIDRow struct {
@@ -90,7 +90,7 @@ SELECT
 FROM 
     ` + "`" + `product` + "`" + `
 WHERE
-    deleted_at IS NULL AND id = ?
+    id = ? AND deleted_at IS NULL
 FOR UPDATE
 `
 
@@ -175,7 +175,7 @@ SELECT
 FROM 
     ` + "`" + `product` + "`" + `
 WHERE 
-    id = ?
+    id = ? AND deleted_at IS NULL
 `
 
 func (q *Queries) GetQuantity(ctx context.Context, id int32) (int32, error) {
@@ -193,7 +193,7 @@ SET
     price = ?,
     quantity = ?,
     image_url = ?
-WHERE id = ?
+WHERE id = ? AND deleted_at IS NULL
 `
 
 type UpdateProductParams struct {
@@ -221,7 +221,7 @@ UPDATE ` + "`" + `product` + "`" + `
 SET
     quantity = ?
 WHERE
-    id = ?
+    id = ? AND deleted_at IS NULL
 `
 
 type UpdateProductByIDParams struct {

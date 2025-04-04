@@ -24,7 +24,7 @@ SELECT
 FROM 
     `product`
 WHERE
-    deleted_at IS NULL AND id = ?;
+    id = ? AND deleted_at IS NULL;
 
 -- name: GetProductByIDForUpdate :one
 SELECT
@@ -32,7 +32,7 @@ SELECT
 FROM 
     `product`
 WHERE
-    deleted_at IS NULL AND id = ?
+    id = ? AND deleted_at IS NULL
 FOR UPDATE;
 
 -- name: UpdateProduct :execresult
@@ -43,19 +43,19 @@ SET
     price = ?,
     quantity = ?,
     image_url = ?
-WHERE id = ?;
+WHERE id = ? AND deleted_at IS NULL;
 
 -- name: UpdateProductByID :execresult
 UPDATE `product`
 SET
     quantity = ?
 WHERE
-    id = ?;
+    id = ? AND deleted_at IS NULL;
 
 -- name: DeleteProduct :execresult
 UPDATE `product`
 SET deleted_at = NOW()
-WHERE id = ?;
+WHERE id = ? AND deleted_at is NULL;
 
 -- name: GetQuantity :one
 SELECT
@@ -63,4 +63,4 @@ SELECT
 FROM 
     `product`
 WHERE 
-    id = ?
+    id = ? AND deleted_at IS NULL;

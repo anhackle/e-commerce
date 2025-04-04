@@ -56,11 +56,13 @@ func (ns NullOrdersPaymentMethod) Value() (driver.Value, error) {
 type OrdersStatus string
 
 const (
-	OrdersStatusCreate  OrdersStatus = "create"
-	OrdersStatusConfirm OrdersStatus = "confirm"
-	OrdersStatusPay     OrdersStatus = "pay"
-	OrdersStatusShip    OrdersStatus = "ship"
-	OrdersStatusFinish  OrdersStatus = "finish"
+	OrdersStatusPending    OrdersStatus = "pending"
+	OrdersStatusPaid       OrdersStatus = "paid"
+	OrdersStatusProcessing OrdersStatus = "processing"
+	OrdersStatusShipped    OrdersStatus = "shipped"
+	OrdersStatusDelivered  OrdersStatus = "delivered"
+	OrdersStatusCancelled  OrdersStatus = "cancelled"
+	OrdersStatusFailed     OrdersStatus = "failed"
 )
 
 func (e *OrdersStatus) Scan(src interface{}) error {

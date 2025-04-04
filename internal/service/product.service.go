@@ -75,12 +75,52 @@ func (ps *productService) GetProducts(ctx context.Context, input model.GetProduc
 
 // CreateProduct implements IProductService.
 func (ps *productService) CreateProduct(ctx context.Context, input model.CreateProductInput) (result int, err error) {
-	_, err = ps.productRepo.CreateProduct(ctx, input)
+	// Check if product(name,price) exists
+	product, err := ps.productRepo.GetProductForCreate(ctx, input)
+	if err == sql.ErrNoRows {
+		_, err = ps.productRepo.CreateProduct(ctx, input)
+		if err != nil {
+			return response.ErrCodeInternal, err
+		}
+
+		return response.ErrCodeSuccess, nil
+	}
+
 	if err != nil {
 		return response.ErrCodeInternal, err
 	}
 
-	return response.ErrCodeSuccess, nil
+	// if product was not deleted --> update quantity = quantity + plus
+	if product.DeletedAt.Valid == false {
+		result, err = ps.UpdateProduct(ctx, model.UpdateProductInput{
+			ID:          int(product.ID),
+			Name:        input.Name,
+			Description: input.Description,
+			Price:       input.Price,
+			Quantity:    int(product.Quantity) + input.Quantity,
+			ImageURL:    input.ImageURL,
+		})
+
+		return result, err
+	}
+
+	// if product was deleted --> update deleted_at nul and quantity
+	// revive product
+	_, err = ps.productRepo.UpdateProductStatus(ctx, int(product.ID))
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	result, err = ps.UpdateProduct(ctx, model.UpdateProductInput{
+		ID:          int(product.ID),
+		Name:        input.Name,
+		Description: input.Description,
+		Price:       input.Price,
+		Quantity:    input.Quantity,
+		ImageURL:    input.ImageURL,
+	})
+
+	return result, err
 }
 
 func NewProductService(productRepo repo.IProductRepo) IProductService {

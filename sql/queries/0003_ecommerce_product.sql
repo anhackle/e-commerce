@@ -6,10 +6,7 @@ INSERT INTO `product` (
     quantity,
     image_url
 )
-VALUES (?, ?, ?, ?, ?)
-ON DUPLICATE KEY 
-UPDATE
-    quantity = quantity  + VALUES(quantity);
+VALUES (?, ?, ?, ?, ?);
 
 -- name: GetProducts :many
 SELECT id, name, description, price, quantity, image_url
@@ -35,6 +32,25 @@ WHERE
     id = ? AND deleted_at IS NULL
 FOR UPDATE;
 
+-- name: GetQuantity :one
+SELECT
+    quantity
+FROM 
+    `product`
+WHERE 
+    id = ? AND deleted_at IS NULL;
+
+-- name: GetProductForCreate :one
+SELECT id, quantity, deleted_at
+FROM `product`
+WHERE name = ? AND price = ?;
+
+-- name: UpdateProductStatus :execresult
+UPDATE `product`
+SET
+    deleted_at = NULL
+WHERE id = ? AND deleted_at IS NOT NULL;
+
 -- name: UpdateProduct :execresult
 UPDATE `product`
 SET
@@ -45,7 +61,7 @@ SET
     image_url = ?
 WHERE id = ? AND deleted_at IS NULL;
 
--- name: UpdateProductByID :execresult
+-- name: UpdateQuantity :execresult
 UPDATE `product`
 SET
     quantity = ?
@@ -56,11 +72,3 @@ WHERE
 UPDATE `product`
 SET deleted_at = NOW()
 WHERE id = ? AND deleted_at is NULL;
-
--- name: GetQuantity :one
-SELECT
-    quantity
-FROM 
-    `product`
-WHERE 
-    id = ? AND deleted_at IS NULL;

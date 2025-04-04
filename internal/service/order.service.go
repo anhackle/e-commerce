@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"slices"
 	"sort"
 
 	"github.com/anle/codebase/internal/database"
@@ -52,11 +53,14 @@ func (os *orderService) GetOrdersForAdmin(ctx context.Context, input model.GetOr
 
 // UpdateStatus implements IOrderService.
 func (os *orderService) UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result int, err error) {
-	status := map[string]string{
-		"create":  "confirm",
-		"confirm": "pay",
-		"pay":     "ship",
-		"ship":    "finish",
+	var status = map[string][]string{
+		"pending":    {"paid", "cancelled"},
+		"paid":       {"processing", "cancelled", "failed"},
+		"processing": {"shipped"},
+		"shipped":    {"delivered"},
+		"delivered":  {},
+		"cancelled":  {},
+		"failed":     {},
 	}
 	order, err := os.orderRepo.GetOrder(ctx, model.GetOrderInput{
 		OrderID: input.OrderID,
@@ -69,7 +73,7 @@ func (os *orderService) UpdateStatus(ctx context.Context, input model.UpdateStat
 		return response.ErrCodeInternal, err
 	}
 
-	if input.Status != status[string(order.Status.OrdersStatus)] {
+	if verifyStatus := slices.Contains(status[string(order.Status.OrdersStatus)], input.Status); !verifyStatus {
 		return response.ErrCodeStatusNotValid, err
 	}
 

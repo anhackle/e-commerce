@@ -9,6 +9,7 @@ services:
       MYSQL_DATABASE: ecommerce
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
+      TZ: Asia/Bangkok
     ports:
       - "3306:3306"
 

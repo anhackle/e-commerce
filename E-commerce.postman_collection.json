@@ -248,7 +248,7 @@
 					"response": []
 				},
 				{
-					"name": "Create product",
+					"name": "Create product (Admin only)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -272,12 +272,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/v1/products/",
+							"raw": "{{baseUrl}}/v1/admin/products/",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"v1",
+								"admin",
 								"products",
 								""
 							]
@@ -286,7 +287,7 @@
 					"response": []
 				},
 				{
-					"name": "Update product",
+					"name": "Update product (Admin only)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -310,12 +311,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/v1/products/",
+							"raw": "{{baseUrl}}/v1/admin/products/",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"v1",
+								"admin",
 								"products",
 								""
 							]
@@ -324,7 +326,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete product",
+					"name": "Delete product (Admin only)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -348,12 +350,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/v1/products/",
+							"raw": "{{baseUrl}}/v1/admin/products/",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"v1",
+								"admin",
 								"products",
 								""
 							]
@@ -383,7 +386,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 13,\n    \"quantity\": 149\n}",
+							"raw": "{\n    \"product_id\": 22,\n    \"quantity\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -588,6 +591,121 @@
 								"v1",
 								"orders",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order detail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": 8\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/orders/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"orders",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update status (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\":1,\n    \"status\":\"confirm\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/orders/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"orders",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orders (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"limit\": 10,\n    \"page\": 1,\n    \"status\":\"create\",\n    \"payment_method\":\"MOMO\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"orders"
 							]
 						}
 					},

@@ -245,7 +245,10 @@ JOIN ` + "`" + `user_profile` + "`" + ` up ON u.id = up.user_id
 WHERE 
     o.status = IF(? = '', o.status, ?) AND 
     o.payment_method = IF(? = '', o.payment_method, ?)
-ORDER BY o.created_at DESC
+ORDER BY
+    CASE WHEN ? = 'created_at' THEN o.created_at
+         WHEN ? = 'total' THEN o.total ELSE o.created_at
+    END ASC
 LIMIT ?
 OFFSET ?
 `
@@ -255,6 +258,8 @@ type GetOrdersForAdminParams struct {
 	IF      interface{}
 	Column3 interface{}
 	IF_2    interface{}
+	Column5 interface{}
+	Column6 interface{}
 	Limit   int32
 	Offset  int32
 }
@@ -278,6 +283,8 @@ func (q *Queries) GetOrdersForAdmin(ctx context.Context, arg GetOrdersForAdminPa
 		arg.IF,
 		arg.Column3,
 		arg.IF_2,
+		arg.Column5,
+		arg.Column6,
 		arg.Limit,
 		arg.Offset,
 	)

@@ -13,5 +13,6 @@ func InitValidator() {
 		v.RegisterValidation("phone", validation.ValidatePhone)
 		v.RegisterValidation("paymentmethod", validation.ValidatePaymentMethod)
 		v.RegisterValidation("status", validation.ValidateStatus)
+		v.RegisterValidation("order_by", validation.ValidateOrderBy)
 	}
 }

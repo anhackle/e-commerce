@@ -46,13 +46,15 @@ func (os *orderService) GetOrderForAdmin(ctx context.Context, input model.GetOrd
 		return orderDetail, response.ErrCodeInternal, err
 	}
 
+	orderDetail = model.GetOrderOutput{
+		OrderID:          int(order.ID),
+		CreatedAt:        order.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+		Status:           string(order.Status.OrdersStatus),
+		ShippingAddreess: order.ShippingAddress,
+		Payment_method:   string(order.PaymentMethod),
+		Total:            order.Total,
+	}
 	for _, item := range items {
-		orderDetail.OrderID = int(order.ID)
-		orderDetail.CreatedAt = order.CreatedAt.Time.Format("2006-01-02 15:04:05")
-		orderDetail.Status = string(order.Status.OrdersStatus)
-		orderDetail.ShippingAddreess = order.ShippingAddress
-		orderDetail.Payment_method = string(order.PaymentMethod)
-		orderDetail.Total = order.Total
 		orderDetail.Items = append(orderDetail.Items, model.GetOrderItemsOutput{
 			Name:        item.Name,
 			Description: item.Description.String,
@@ -334,13 +336,15 @@ func (os *orderService) GetOrder(ctx context.Context, input model.GetOrderInput)
 		return orderDetail, response.ErrCodeInternal, err
 	}
 
+	orderDetail = model.GetOrderOutput{
+		OrderID:          int(order.ID),
+		CreatedAt:        order.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+		Status:           string(order.Status.OrdersStatus),
+		ShippingAddreess: order.ShippingAddress,
+		Payment_method:   string(order.PaymentMethod),
+		Total:            order.Total,
+	}
 	for _, item := range items {
-		orderDetail.OrderID = int(order.ID)
-		orderDetail.CreatedAt = order.CreatedAt.Time.Format("2006-01-02 15:04:05")
-		orderDetail.Status = string(order.Status.OrdersStatus)
-		orderDetail.ShippingAddreess = order.ShippingAddress
-		orderDetail.Payment_method = string(order.PaymentMethod)
-		orderDetail.Total = order.Total
 		orderDetail.Items = append(orderDetail.Items, model.GetOrderItemsOutput{
 			Name:        item.Name,
 			Description: item.Description.String,

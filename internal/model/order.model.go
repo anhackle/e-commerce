@@ -62,6 +62,7 @@ type GetOrdersForAdminInput struct {
 	Page           int    `json:"page" binding:"required,numeric,gt=0"`
 	Status         string `json:"status"`
 	Payment_method string `json:"payment_method"`
+	OrderBy        string `json:"order_by" binding:"order_by"`
 }
 
 type GetOrdersForAdminOutput struct {

@@ -83,6 +83,8 @@ func (or *orderRepo) GetOrdersForAdmin(ctx context.Context, input model.GetOrder
 		IF:      input.Status,
 		Column3: input.Payment_method,
 		IF_2:    input.Payment_method,
+		Column5: input.OrderBy,
+		Column6: input.OrderBy,
 	})
 	if err != nil {
 		return result, err

@@ -66,7 +66,10 @@ JOIN `user_profile` up ON u.id = up.user_id
 WHERE 
     o.status = IF(? = '', o.status, ?) AND 
     o.payment_method = IF(? = '', o.payment_method, ?)
-ORDER BY o.created_at DESC
+ORDER BY
+    CASE WHEN ? = 'created_at' THEN o.created_at
+         WHEN ? = 'total' THEN o.total ELSE o.created_at
+    END ASC
 LIMIT ?
 OFFSET ?;
 

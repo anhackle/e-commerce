@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/anle/codebase/internal/dao"
 	"github.com/anle/codebase/internal/database"
+
 	"github.com/anle/codebase/internal/model"
 )
 
@@ -14,7 +16,8 @@ type IProductRepo interface {
 	UpdateProductStatus(ctx context.Context, id int) (result sql.Result, err error)
 	UpdateProductByID(ctx context.Context, input model.UpdateProductByIDInput) (result sql.Result, err error)
 	DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result sql.Result, err error)
-	GetProducts(ctx context.Context, input model.GetProductInput) (products []database.GetProductsRow, err error)
+	GetProducts(ctx context.Context, input model.GetProductsInput) (products []database.GetProductsRow, err error)
+	GetProductsWithSearchForAdmin(ctx context.Context, input model.GetProductsForAdminInput) (products []dao.GetProductsWithSearchForAdminRow, err error)
 	GetProductByID(ctx context.Context, productID int) (product database.GetProductByIDRow, err error)
 	GetProductByIDForUpdate(ctx context.Context, productID int) (product database.GetProductByIDForUpdateRow, err error)
 	GetProductForCreate(ctx context.Context, input model.CreateProductInput) (product database.GetProductForCreateRow, err error)
@@ -24,6 +27,23 @@ type IProductRepo interface {
 
 type productRepo struct {
 	queries *database.Queries
+	dto     *dao.Queries
+}
+
+// GetProductsForAdmin implements IProductRepo.
+func (pr *productRepo) GetProductsWithSearchForAdmin(ctx context.Context, input model.GetProductsForAdminInput) (products []dao.GetProductsWithSearchForAdminRow, err error) {
+	products, err = pr.dto.GetProductsWithSearchForAdmin(ctx, dao.GetProductsWithSearchForAdminParams{
+		Limit:     int32(input.Limit),
+		Offset:    int32(input.Page),
+		FromPrice: input.MinPrice,
+		ToPrice:   input.MaxPrice,
+		Search:    input.Search,
+	})
+	if err != nil {
+		return products, err
+	}
+
+	return products, nil
 }
 
 // UpdateProductStatus implements IProductRepo.
@@ -135,7 +155,7 @@ func (pr *productRepo) UpdateProduct(ctx context.Context, input model.UpdateProd
 }
 
 // GetProducts implements IProductRepo.
-func (pr *productRepo) GetProducts(ctx context.Context, input model.GetProductInput) (products []database.GetProductsRow, err error) {
+func (pr *productRepo) GetProducts(ctx context.Context, input model.GetProductsInput) (products []database.GetProductsRow, err error) {
 	products, err = pr.queries.GetProducts(ctx, database.GetProductsParams{
 		Limit:  int32(input.Limit),
 		Offset: int32(input.Page),
@@ -166,5 +186,6 @@ func (pr *productRepo) CreateProduct(ctx context.Context, input model.CreateProd
 func NewProductRepo(dbConn *sql.DB) IProductRepo {
 	return &productRepo{
 		queries: database.New(dbConn),
+		dto:     dao.New(dbConn),
 	}
 }

@@ -23,6 +23,7 @@ func (pr *ProductRouter) InitProductRouter(router *gin.RouterGroup) {
 	productRouterPrivate.Use(middlewares.RoleVerifyMiddleware())
 
 	{
+		productRouterPrivate.POST("/search", productController.GetProductsForAdmin)
 		productRouterPrivate.POST("/", productController.CreateProduct)
 		productRouterPrivate.PUT("/", productController.UpdateProduct)
 		productRouterPrivate.DELETE("/", productController.DeleteProduct)

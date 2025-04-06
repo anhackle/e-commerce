@@ -34,7 +34,7 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 }
 
 func (pc *ProductController) GetProducts(c *gin.Context) {
-	var input model.GetProductInput
+	var input model.GetProductsInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
 		return
@@ -52,6 +52,18 @@ func (pc *ProductController) CreateProduct(c *gin.Context) {
 
 	result, _ := pc.productService.CreateProduct(c, input)
 	response.HandleResult(c, result, nil)
+}
+
+func (pc *ProductController) GetProductsForAdmin(c *gin.Context) {
+	var input model.GetProductsForAdminInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	products, result, _ := pc.productService.GetProductsForAdmin(c, input)
+
+	response.HandleResult(c, result, products)
 }
 
 func NewProductController(productService service.IProductService) *ProductController {

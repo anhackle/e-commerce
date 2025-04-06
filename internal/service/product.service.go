@@ -13,11 +13,34 @@ type IProductService interface {
 	CreateProduct(ctx context.Context, input model.CreateProductInput) (result int, err error)
 	UpdateProduct(ctx context.Context, input model.UpdateProductInput) (result int, err error)
 	DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result int, err error)
-	GetProducts(ctx context.Context, input model.GetProductInput) (products []model.GetProductOutput, result int, err error)
+	GetProducts(ctx context.Context, input model.GetProductsInput) (products []model.GetProductsOutput, result int, err error)
+	GetProductsForAdmin(ctx context.Context, input model.GetProductsForAdminInput) (products []model.GetProductsForAdminOutput, result int, err error)
 }
 
 type productService struct {
 	productRepo repo.IProductRepo
+}
+
+// GetProductsForAdmin implements IProductService.
+func (ps *productService) GetProductsForAdmin(ctx context.Context, input model.GetProductsForAdminInput) (products []model.GetProductsForAdminOutput, result int, err error) {
+	input.Page = (input.Page - 1) * input.Limit
+	productsRepo, err := ps.productRepo.GetProductsWithSearchForAdmin(ctx, input)
+	if err != nil {
+		return products, response.ErrCodeInternal, err
+	}
+
+	for _, product := range productsRepo {
+		products = append(products, model.GetProductsForAdminOutput{
+			ID:          int(product.ID),
+			Name:        product.Name,
+			Description: product.Description.String,
+			Price:       int(product.Price),
+			Quantity:    int(product.Quantity),
+			ImageURL:    product.ImageUrl,
+		})
+	}
+
+	return products, response.ErrCodeSuccess, nil
 }
 
 // DeleteProduct implements IProductService.
@@ -49,8 +72,8 @@ func (ps *productService) UpdateProduct(ctx context.Context, input model.UpdateP
 }
 
 // GetProducts implements IProductService.
-func (ps *productService) GetProducts(ctx context.Context, input model.GetProductInput) (products []model.GetProductOutput, result int, err error) {
-	var getProductInput = model.GetProductInput{
+func (ps *productService) GetProducts(ctx context.Context, input model.GetProductsInput) (products []model.GetProductsOutput, result int, err error) {
+	var getProductInput = model.GetProductsInput{
 		Limit: input.Limit,
 		Page:  (input.Page - 1) * input.Limit,
 	}
@@ -60,7 +83,7 @@ func (ps *productService) GetProducts(ctx context.Context, input model.GetProduc
 	}
 
 	for _, product := range productsRepo {
-		products = append(products, model.GetProductOutput{
+		products = append(products, model.GetProductsOutput{
 			ID:          int(product.ID),
 			Name:        product.Name,
 			Description: product.Description.String,

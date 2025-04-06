@@ -1,7 +1,7 @@
 package model
 
 type CreateOrderInput struct {
-	PaymentMethod   string `json:"payment_method" binding:"required,paymentmethod"`
+	PaymentMethod   string `json:"payment_method" binding:"required,payment_method"`
 	ShippingAddress string `json:"shipping_address" binding:"required,endsnotwith= ,startsnotwith= "`
 	TotalPrice      int64  `json:"total_price"`
 }

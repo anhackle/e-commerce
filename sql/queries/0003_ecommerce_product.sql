@@ -72,3 +72,14 @@ WHERE
 UPDATE `product`
 SET deleted_at = NOW()
 WHERE id = ? AND deleted_at is NULL;
+
+-- name: GetProductsForAdmin :many
+SELECT id, name, description, price, quantity, image_url
+FROM `product`
+WHERE 
+    deleted_at IS NULL AND
+    price BETWEEN ? AND ? AND
+    MATCH(name) AGAINST (? IN NATURAL LANGUAGE MODE)
+ORDER BY created_at DESC
+LIMIT ?
+OFFSET ?;

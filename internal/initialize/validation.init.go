@@ -11,8 +11,9 @@ func InitValidator() {
 		v.RegisterValidation("password", validation.ValidatePassword)
 		v.RegisterValidation("name", validation.ValidateName)
 		v.RegisterValidation("phone", validation.ValidatePhone)
-		v.RegisterValidation("paymentmethod", validation.ValidatePaymentMethod)
+		v.RegisterValidation("payment_method", validation.ValidatePaymentMethod)
 		v.RegisterValidation("status", validation.ValidateStatus)
 		v.RegisterValidation("order_by", validation.ValidateOrderBy)
+		v.RegisterValidation("product_name", validation.ValidateProductName)
 	}
 }

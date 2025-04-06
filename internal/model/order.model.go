@@ -87,3 +87,9 @@ type GetOrderStatusInput struct {
 type GetOrderStatusOutput struct {
 	Status string `json:"status"`
 }
+
+type GetOrderSummaryOutput struct {
+	Status      string `json:"status"`
+	TotalPrice  int64  `json:"total_price"`
+	TotalAmount int64  `json:"total_amount"`
+}

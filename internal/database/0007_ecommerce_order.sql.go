@@ -129,6 +129,44 @@ func (q *Queries) GetOrderStatus(ctx context.Context, arg GetOrderStatusParams) 
 	return status, err
 }
 
+const getOrderSummary = `-- name: GetOrderSummary :many
+SELECT
+    status,
+    COUNT(*) AS total_amount,
+    CAST(SUM(total) AS SIGNED) AS total_price
+FROM ` + "`" + `orders` + "`" + `
+GROUP BY status
+`
+
+type GetOrderSummaryRow struct {
+	Status      NullOrdersStatus
+	TotalAmount int64
+	TotalPrice  int64
+}
+
+func (q *Queries) GetOrderSummary(ctx context.Context) ([]GetOrderSummaryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOrderSummary)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOrderSummaryRow
+	for rows.Next() {
+		var i GetOrderSummaryRow
+		if err := rows.Scan(&i.Status, &i.TotalAmount, &i.TotalPrice); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOrders = `-- name: GetOrders :many
 SELECT 
     id,

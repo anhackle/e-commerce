@@ -21,6 +21,7 @@ type IOrderService interface {
 	GetOrderForAdmin(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error)
 	CreatePayment(ctx context.Context, input model.CreatePaymentInput) (result int, err error)
 	GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (orderStatus model.GetOrderStatusOutput, result int, err error)
+	GetOrderSummary(ctx context.Context) (orderSummary []model.GetOrderSummaryOutput, result int, err error)
 }
 
 type orderService struct {
@@ -28,6 +29,24 @@ type orderService struct {
 	cartRepo    repo.ICartRepo
 	productRepo repo.IProductRepo
 	orderRepo   repo.IOrderRepo
+}
+
+// GetOrderSummary implements IOrderService.
+func (os *orderService) GetOrderSummary(ctx context.Context) (orderSummary []model.GetOrderSummaryOutput, result int, err error) {
+	orderSummaryRepo, err := os.orderRepo.GetOrderSummary(ctx)
+	if err != nil {
+		return orderSummary, response.ErrCodeInternal, err
+	}
+
+	for _, row := range orderSummaryRepo {
+		orderSummary = append(orderSummary, model.GetOrderSummaryOutput{
+			Status:      string(row.Status.OrdersStatus),
+			TotalPrice:  row.TotalPrice,
+			TotalAmount: row.TotalAmount,
+		})
+	}
+
+	return orderSummary, response.ErrCodeSuccess, nil
 }
 
 // GetOrderForAdmin implements IOrderService.

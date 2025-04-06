@@ -74,3 +74,11 @@ OFFSET ?;
 SELECT status
 FROM `orders`
 WHERE id = ? AND user_id = ?;
+
+-- name: GetOrderSummary :many
+SELECT
+    status,
+    COUNT(*) AS total_amount,
+    CAST(SUM(total) AS SIGNED) AS total_price
+FROM `orders`
+GROUP BY status;

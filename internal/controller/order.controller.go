@@ -95,6 +95,18 @@ func (oc *OrderController) GetOrderStatus(c *gin.Context) {
 	response.HandleResult(c, result, orderStatus)
 }
 
+func (oc *OrderController) GetOrderForAdmin(c *gin.Context) {
+	var input model.GetOrderInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	orderDetail, result, _ := oc.orderService.GetOrderForAdmin(c, input)
+
+	response.HandleResult(c, result, orderDetail)
+}
+
 func NewOrderController(orderService service.IOrderService) *OrderController {
 	return &OrderController{
 		orderService: orderService,

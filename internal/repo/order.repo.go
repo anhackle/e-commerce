@@ -18,6 +18,7 @@ type IOrderRepo interface {
 	CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (result sql.Result, err error)
 	UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result sql.Result, err error)
 	GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (result []database.GetOrdersForAdminRow, err error)
+	GetOrderForAdmin(ctx context.Context, input model.GetOrderInput) (result database.GetOrderForAdminRow, err error)
 	CreatePayment(ctx context.Context, input model.CreatePaymentInput) (paymentStatus bool, err error)
 	GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (result database.NullOrdersStatus, err error)
 	WithTx(tx *sql.Tx) IOrderRepo
@@ -25,6 +26,16 @@ type IOrderRepo interface {
 
 type orderRepo struct {
 	queries *database.Queries
+}
+
+// GetOrderForAdmin implements IOrderRepo.
+func (or *orderRepo) GetOrderForAdmin(ctx context.Context, input model.GetOrderInput) (result database.GetOrderForAdminRow, err error) {
+	result, err = or.queries.GetOrderForAdmin(ctx, int32(input.OrderID))
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }
 
 // GetOrderStatus implements IOrderRepo.

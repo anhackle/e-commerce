@@ -18,6 +18,7 @@ type IOrderService interface {
 	GetOrder(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error)
 	UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result int, err error)
 	GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (orders []model.GetOrdersForAdminOutput, result int, err error)
+	GetOrderForAdmin(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error)
 	CreatePayment(ctx context.Context, input model.CreatePaymentInput) (result int, err error)
 	GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (orderStatus model.GetOrderStatusOutput, result int, err error)
 }
@@ -27,6 +28,41 @@ type orderService struct {
 	cartRepo    repo.ICartRepo
 	productRepo repo.IProductRepo
 	orderRepo   repo.IOrderRepo
+}
+
+// GetOrderForAdmin implements IOrderService.
+func (os *orderService) GetOrderForAdmin(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error) {
+	order, err := os.orderRepo.GetOrderForAdmin(ctx, input)
+	if err == sql.ErrNoRows {
+		return orderDetail, response.ErrCodeOrderNotFound, err
+	}
+
+	if err != nil {
+		return orderDetail, response.ErrCodeInternal, err
+	}
+
+	items, err := os.orderRepo.GetOrderItems(ctx, int(order.ID))
+	if err != nil {
+		return orderDetail, response.ErrCodeInternal, err
+	}
+
+	for _, item := range items {
+		orderDetail.OrderID = int(order.ID)
+		orderDetail.CreatedAt = order.CreatedAt.Time.Format("2006-01-02 15:04:05")
+		orderDetail.Status = string(order.Status.OrdersStatus)
+		orderDetail.ShippingAddreess = order.ShippingAddress
+		orderDetail.Payment_method = string(order.PaymentMethod)
+		orderDetail.Total = order.Total
+		orderDetail.Items = append(orderDetail.Items, model.GetOrderItemsOutput{
+			Name:        item.Name,
+			Description: item.Description.String,
+			Price:       item.Price,
+			Quantity:    int(item.Quantity),
+			Image_url:   item.ImageUrl,
+		})
+	}
+
+	return orderDetail, response.ErrCodeSuccess, nil
 }
 
 // GetOrderStatus implements IOrderService.

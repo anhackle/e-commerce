@@ -31,6 +31,17 @@ SELECT
 FROM `orders`
 WHERE id = ? AND user_id = ?;
 
+-- name: GetOrderForAdmin :one
+SELECT
+    id,
+    created_at,
+    status,
+    shipping_address,
+    payment_method,
+    total
+FROM `orders`
+WHERE id = ?;
+
 -- name: UpdateStatus :execresult
 UPDATE `orders`
 SET status = ?

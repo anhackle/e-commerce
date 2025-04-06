@@ -24,7 +24,7 @@ type productService struct {
 // GetProductsForAdmin implements IProductService.
 func (ps *productService) GetProductsForAdmin(ctx context.Context, input model.GetProductsForAdminInput) (products []model.GetProductsForAdminOutput, result int, err error) {
 	input.Page = (input.Page - 1) * input.Limit
-	productsRepo, err := ps.productRepo.GetProductsForAdmin(ctx, input)
+	productsRepo, err := ps.productRepo.GetProductsWithSearchForAdmin(ctx, input)
 	if err != nil {
 		return products, response.ErrCodeInternal, err
 	}

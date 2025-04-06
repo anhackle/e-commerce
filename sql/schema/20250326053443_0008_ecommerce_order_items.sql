@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS `order_item` (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (order_id) REFERENCES `orders`(id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+    
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- +goose StatementEnd
 
 -- +goose Down

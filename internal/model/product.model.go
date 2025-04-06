@@ -44,9 +44,9 @@ type GetProductsOutput struct {
 type GetProductsForAdminInput struct {
 	Limit    int    `json:"limit" binding:"required,numeric,max=20,gt=0"`
 	Page     int    `json:"page" binding:"required,numeric,gt=0"`
-	MinPrice int64  `json:"min_price" binding:"required,numeric,min=0"`
-	MaxPrice int64  `json:"max_price" binding:"required,numeric,min=0"`
-	Search   string `json:"search" binding:"required,product_name,max=255,endsnotwith= ,startsnotwith= "`
+	MinPrice int64  `json:"min_price" binding:"numeric,min=0"`
+	MaxPrice int64  `json:"max_price" binding:"numeric,min=0"`
+	Search   string `json:"search" binding:"product_name,max=255,endsnotwith= ,startsnotwith= "`
 }
 
 type GetProductsForAdminOutput struct {

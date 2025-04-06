@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS `orders` (
     shipping_address TEXT NOT NULL,
     total BIGINT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+    
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- +goose StatementEnd
 
 -- +goose Down

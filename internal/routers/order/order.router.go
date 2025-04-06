@@ -31,6 +31,7 @@ func (cr *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 		orderRouterPrivate.PUT("/status", orderController.UpdateStatus)
 		orderRouterPrivate.POST("/", orderController.GetOrdersForAdmin)
 		orderRouterPrivate.POST("/search", orderController.GetOrderForAdmin)
+		orderRouterPrivate.GET("/summary", orderController.GetOrderSummary)
 	}
 
 }

@@ -107,6 +107,12 @@ func (oc *OrderController) GetOrderForAdmin(c *gin.Context) {
 	response.HandleResult(c, result, orderDetail)
 }
 
+func (oc *OrderController) GetOrderSummary(c *gin.Context) {
+	orderSummary, result, _ := oc.orderService.GetOrderSummary(c)
+
+	response.HandleResult(c, result, orderSummary)
+}
+
 func NewOrderController(orderService service.IOrderService) *OrderController {
 	return &OrderController{
 		orderService: orderService,

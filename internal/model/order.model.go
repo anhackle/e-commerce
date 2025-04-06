@@ -74,3 +74,15 @@ type GetOrdersForAdminOutput struct {
 	Payment_method   string `json:"payment_method"`
 	Total            int64  `json:"total"`
 }
+
+type CreatePaymentInput struct {
+	OrderID int `json:"order_id" binding:"required,numeric,min=0"`
+}
+
+type GetOrderStatusInput struct {
+	OrderID int `json:"order_id" binding:"required,numeric,min=0"`
+}
+
+type GetOrderStatusOutput struct {
+	Status string `json:"status"`
+}

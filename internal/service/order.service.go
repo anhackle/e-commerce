@@ -18,6 +18,8 @@ type IOrderService interface {
 	GetOrder(ctx context.Context, input model.GetOrderInput) (orderDetail model.GetOrderOutput, result int, err error)
 	UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result int, err error)
 	GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (orders []model.GetOrdersForAdminOutput, result int, err error)
+	CreatePayment(ctx context.Context, input model.CreatePaymentInput) (result int, err error)
+	GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (orderStatus model.GetOrderStatusOutput, result int, err error)
 }
 
 type orderService struct {
@@ -25,6 +27,65 @@ type orderService struct {
 	cartRepo    repo.ICartRepo
 	productRepo repo.IProductRepo
 	orderRepo   repo.IOrderRepo
+}
+
+// GetOrderStatus implements IOrderService.
+func (os *orderService) GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (orderStatus model.GetOrderStatusOutput, result int, err error) {
+	status, err := os.orderRepo.GetOrderStatus(ctx, input)
+	if err == sql.ErrNoRows {
+		return orderStatus, response.ErrCodeOrderNotFound, err
+	}
+
+	if err != nil {
+		return orderStatus, response.ErrCodeInternal, err
+	}
+
+	orderStatus.Status = string(status.OrdersStatus)
+
+	return orderStatus, response.ErrCodeSuccess, nil
+
+}
+
+// CreatePayment implements IOrderService.
+func (os *orderService) CreatePayment(ctx context.Context, input model.CreatePaymentInput) (result int, err error) {
+	//Check order status first
+	order, err := os.orderRepo.GetOrder(ctx, model.GetOrderInput{
+		OrderID: input.OrderID,
+	})
+	if err == sql.ErrNoRows {
+		return response.ErrCodeOrderNotFound, err
+	}
+
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	if order.Status.OrdersStatus != database.OrdersStatusPending {
+		return response.ErrCodeStatusNotValid, err
+	}
+
+	//Simulate third party payment
+	paymentStatus, err := os.orderRepo.CreatePayment(ctx, input)
+	if err != nil {
+		return response.ErrCodePaymentNotSuccess, err
+	}
+
+	//Check result and decide to update order status
+	if !paymentStatus {
+		return response.ErrCodePaymentNotSuccess, err
+	}
+
+	//Update order status
+	_, err = os.orderRepo.UpdateStatus(ctx, model.UpdateStatusInput{
+		OrderID: input.OrderID,
+		Status:  string(database.OrdersStatusPaid),
+	})
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	return response.ErrCodeSuccess, nil
+
 }
 
 // GetOrdersForAdmin implements IOrderService.

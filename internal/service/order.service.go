@@ -136,6 +136,7 @@ func (os *orderService) GetOrdersForAdmin(ctx context.Context, input model.GetOr
 
 	for _, order := range ordersRepo {
 		orders = append(orders, model.GetOrdersForAdminOutput{
+			OrderID:          int(order.OrderID),
 			FirstName:        order.FirstName.String,
 			LastName:         order.LastName.String,
 			PhoneNumber:      order.PhoneNumber.String,

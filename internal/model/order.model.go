@@ -65,6 +65,7 @@ type GetOrdersForAdminInput struct {
 }
 
 type GetOrdersForAdminOutput struct {
+	OrderID          int    `json:"order_id"`
 	FirstName        string `json:"first_name"`
 	LastName         string `json:"last_name"`
 	PhoneNumber      string `json:"phone_number"`

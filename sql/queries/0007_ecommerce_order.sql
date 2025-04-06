@@ -17,6 +17,7 @@ SELECT
     total
 FROM orders
 WHERE user_id = ?
+ORDER BY created_at DESC
 LIMIT ?
 OFFSET ?;
 
@@ -65,6 +66,7 @@ JOIN `user_profile` up ON u.id = up.user_id
 WHERE 
     o.status = IF(? = '', o.status, ?) AND 
     o.payment_method = IF(? = '', o.payment_method, ?)
+ORDER BY o.created_at DESC
 LIMIT ?
 OFFSET ?;
 

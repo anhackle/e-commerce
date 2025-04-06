@@ -76,6 +76,24 @@ func (q *Queries) GetOrder(ctx context.Context, arg GetOrderParams) (GetOrderRow
 	return i, err
 }
 
+const getOrderStatus = `-- name: GetOrderStatus :one
+SELECT status
+FROM ` + "`" + `orders` + "`" + `
+WHERE id = ? AND user_id = ?
+`
+
+type GetOrderStatusParams struct {
+	ID     int32
+	UserID int32
+}
+
+func (q *Queries) GetOrderStatus(ctx context.Context, arg GetOrderStatusParams) (NullOrdersStatus, error) {
+	row := q.db.QueryRowContext(ctx, getOrderStatus, arg.ID, arg.UserID)
+	var status NullOrdersStatus
+	err := row.Scan(&status)
+	return status, err
+}
+
 const getOrders = `-- name: GetOrders :many
 SELECT 
     id,

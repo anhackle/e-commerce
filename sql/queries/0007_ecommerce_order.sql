@@ -55,4 +55,9 @@ WHERE
     o.status = IF(? = '', o.status, ?) AND 
     o.payment_method = IF(? = '', o.payment_method, ?)
 LIMIT ?
-OFFSET ?
+OFFSET ?;
+
+-- name: GetOrderStatus :one
+SELECT status
+FROM `orders`
+WHERE id = ? AND user_id = ?;

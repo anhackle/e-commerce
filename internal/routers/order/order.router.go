@@ -19,6 +19,8 @@ func (cr *OrderRouter) InitOrderRouter(router *gin.RouterGroup) {
 		orderRouterPublic.GET("/", orderController.GetOrders)
 		orderRouterPublic.POST("/search", orderController.GetOrder)
 		orderRouterPublic.POST("/", orderController.CreateOrder)
+		orderRouterPublic.PUT("/pay", orderController.CreatePayment)
+		orderRouterPublic.POST("/status", orderController.GetOrderStatus)
 	}
 
 	orderRouterPrivate := router.Group("/admin/orders")

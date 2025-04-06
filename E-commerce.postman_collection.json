@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\":\"   admin124.vn@gmail.com   \",\n    \"password\": \"Abc@123\"\n}",
+							"raw": "{\n    \"email\":\"admin.vn@gmail.com\",\n    \"password\": \"Abc@123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -91,6 +91,28 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		},
@@ -264,7 +286,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"          \",\n    \"description\": \"            \",\n    \"price\": 22990000,\n    \"quantity\": 50,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
+							"raw": "{\n    \"name\": \"Laptop\",\n    \"description\": \"Lenovo Thinkpad P15\",\n    \"price\": 50000000,\n    \"quantity\": 20,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -303,7 +325,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": -100,\n    \"name\": \"laptop\",\n    \"description\": \"Lenovo Thinkpad P15\",\n    \"price\": 50000000,\n    \"quantity\": 10,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
+							"raw": "{\n    \"product_id\": 20,\n    \"name\": \"Laptop\",\n    \"description\": \"Lenovo Thinkpad P15\",\n    \"price\": 150000000090000000,\n    \"quantity\": 100,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -342,7 +364,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 100\n}",
+							"raw": "{\n    \"product_id\": 19\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -613,7 +635,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"order_id\": 8\n}",
+							"raw": "{\n    \"order_id\": 2\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -629,6 +651,82 @@
 								"v1",
 								"orders",
 								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": 3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/orders/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"orders",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Make payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/orders/pay",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"orders",
+								"pay"
 							]
 						}
 					},
@@ -651,7 +749,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"order_id\":1,\n    \"status\":\"confirm\"\n}",
+							"raw": "{\n    \"order_id\":2,\n    \"status\":\"delivered\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

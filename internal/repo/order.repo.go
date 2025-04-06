@@ -3,6 +3,8 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"math/rand"
+	"time"
 
 	"github.com/anle/codebase/internal/database"
 	"github.com/anle/codebase/internal/model"
@@ -16,11 +18,38 @@ type IOrderRepo interface {
 	CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (result sql.Result, err error)
 	UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result sql.Result, err error)
 	GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (result []database.GetOrdersForAdminRow, err error)
+	CreatePayment(ctx context.Context, input model.CreatePaymentInput) (paymentStatus bool, err error)
+	GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (result database.NullOrdersStatus, err error)
 	WithTx(tx *sql.Tx) IOrderRepo
 }
 
 type orderRepo struct {
 	queries *database.Queries
+}
+
+// GetOrderStatus implements IOrderRepo.
+func (or *orderRepo) GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (result database.NullOrdersStatus, err error) {
+	result, err = or.queries.GetOrderStatus(ctx, database.GetOrderStatusParams{
+		ID:     int32(input.OrderID),
+		UserID: int32(ctx.Value("userID").(int)),
+	})
+
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+// CreatePayment implements IOrderRepo.
+func (or *orderRepo) CreatePayment(ctx context.Context, input model.CreatePaymentInput) (paymentStatus bool, err error) {
+	// Simulate third party payment
+	// In a real-world scenario, you would call a payment gateway API here
+	// and check the payment status.
+	// For this example, we'll assume the payment is always successful.
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	// Update the order status to "Paid" in the database
+	return r.Intn(2) == 1, nil
 }
 
 // GetOrdersForAdmin implements IOrderRepo.

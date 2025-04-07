@@ -65,6 +65,18 @@ func (uc *UserController) GetUsersForAdmin(c *gin.Context) {
 	response.HandleResult(c, result, users)
 }
 
+func (uc *UserController) DeleteUser(c *gin.Context) {
+	var input model.DeleteUserInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	result, _ := uc.userService.DeleteUser(c, input)
+
+	response.HandleResult(c, result, nil)
+}
+
 func NewUserController(userService service.IUserService) *UserController {
 	return &UserController{
 		userService: userService,

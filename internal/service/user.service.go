@@ -17,10 +17,25 @@ type IUserService interface {
 	ChangePassword(ctx context.Context, input model.ChangePasswordInput) (result int, err error)
 	UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result int, err error)
 	GetUsersForAdmin(ctx context.Context, input model.GetUsersForAdminInput) (users []model.GetUsersForAdminOutput, result int, err error)
+	DeleteUser(ctx context.Context, input model.DeleteUserInput) (result int, err error)
 }
 
 type userService struct {
 	userRepo repo.IUserRepo
+}
+
+// DeleteUser implements IUserService.
+func (us *userService) DeleteUser(ctx context.Context, input model.DeleteUserInput) (result int, err error) {
+	_, err = us.userRepo.DeleteUser(ctx, input)
+	if err == sql.ErrNoRows {
+		return response.ErrCodeUserNotFound, err
+	}
+
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	return response.ErrCodeSuccess, nil
 }
 
 // GetUsersForAdmin implements IUserService.

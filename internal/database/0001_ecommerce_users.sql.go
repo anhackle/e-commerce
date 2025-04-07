@@ -37,10 +37,20 @@ func (q *Queries) CreateUserProfile(ctx context.Context, userID int32) (sql.Resu
 	return q.db.ExecContext(ctx, createUserProfile, userID)
 }
 
+const deleteUser = `-- name: DeleteUser :execresult
+UPDATE ` + "`" + `user` + "`" + `
+SET deleted_at = NOW()
+WHERE id = ? AND deleted_at IS NULL
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int32) (sql.Result, error) {
+	return q.db.ExecContext(ctx, deleteUser, id)
+}
+
 const findByEmail = `-- name: FindByEmail :one
 SELECT id, email, password, role
 FROM ` + "`" + `user` + "`" + `
-WHERE email = ?
+WHERE email = ? AND deleted_at IS NULL
 `
 
 type FindByEmailRow struct {
@@ -65,7 +75,7 @@ func (q *Queries) FindByEmail(ctx context.Context, email string) (FindByEmailRow
 const findByUserId = `-- name: FindByUserId :one
 SELECT id, email, password, role
 FROM ` + "`" + `user` + "`" + `
-WHERE id = ?
+WHERE id = ? AND deleted_at IS NULL
 `
 
 type FindByUserIdRow struct {
@@ -91,7 +101,7 @@ const updatePassword = `-- name: UpdatePassword :execresult
 UPDATE ` + "`" + `user` + "`" + `
 SET
     password = ?
-WHERE id = ?
+WHERE id = ? AND deleted_at IS NULL
 `
 
 type UpdatePasswordParams struct {
@@ -106,7 +116,7 @@ func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) 
 const updateRole = `-- name: UpdateRole :execresult
 UPDATE ` + "`" + `user` + "`" + `
 SET role = ?
-WHERE id = ?
+WHERE id = ? AND deleted_at IS NULL
 `
 
 type UpdateRoleParams struct {

@@ -27,5 +27,6 @@ func (ur *UserRouter) InitUserRouter(router *gin.RouterGroup) {
 	{
 		UserRouterPrivate.PUT("/role", userController.UpdateRole)
 		UserRouterPrivate.POST("/search", userController.GetUsersForAdmin)
+		UserRouterPrivate.DELETE("/", userController.DeleteUser)
 	}
 }

@@ -36,3 +36,7 @@ type GetUsersForAdminOutput struct {
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 }
+
+type DeleteUserInput struct {
+	UserID int `json:"user_id" binding:"required,numeric,min=0"`
+}

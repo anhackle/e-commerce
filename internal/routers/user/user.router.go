@@ -20,4 +20,11 @@ func (ur *UserRouter) InitUserRouter(router *gin.RouterGroup) {
 		UserRouterPublic.PUT("/profile", userController.UpdateProfile)
 		UserRouterPublic.PUT("/password", userController.ChangePassword)
 	}
+
+	UserRouterPrivate := router.Group("/admin/user")
+	UserRouterPrivate.Use(middlewares.JWTMiddleware())
+	UserRouterPrivate.Use(middlewares.RoleVerifyMiddleware())
+	{
+		UserRouterPrivate.PUT("/role", userController.UpdateRole)
+	}
 }

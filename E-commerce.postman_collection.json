@@ -155,7 +155,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"first_name\": \"thai\",\n    \"last_name\": \"nguyen cao\",\n    \"phone_number\": \"0325364510\",\n    \"address\": \"Ho Chi Minh City\"\n}",
+							"raw": "{\n    \"first_name\": \"Thái\",\n    \"last_name\": \"Nguyễn Cao\",\n    \"phone_number\": \"0965364510\",\n    \"address\": \"Vinhomes Grand Park Thu Duc City\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -270,6 +270,45 @@
 					"response": []
 				},
 				{
+					"name": "Get products (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"limit\": 10,\n    \"page\": 1,\n    \"min_price\":30000000,\n    \"max_price\":0,\n    \"search\":\"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/products/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"products",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create product (Admin only)",
 					"request": {
 						"auth": {
@@ -286,7 +325,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Laptop\",\n    \"description\": \"Lenovo Thinkpad P15\",\n    \"price\": 50000000,\n    \"quantity\": 20,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
+							"raw": "{\n    \"name\": \"Iphone 15 Pro\",\n    \"description\": \"Iphone 15 Pro 256Gb\",\n    \"price\": 35000000,\n    \"quantity\": 20,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -325,7 +364,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 20,\n    \"name\": \"Laptop\",\n    \"description\": \"Lenovo Thinkpad P15\",\n    \"price\": 150000000090000000,\n    \"quantity\": 100,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
+							"raw": "{\n    \"product_id\":3,\n    \"name\": \"Macbook Pro M5\",\n    \"description\": \"Macbook Pro M5 SSD 256Gb Ram 32Gb\",\n    \"price\": 40000000,\n    \"quantity\": 20,\n    \"image_url\": \"https://download.lenovo.com/pccbbs/mobiles_pdf/tp_p15_p17_p1_gen3_ubuntu_20.04_lts_installation_v1.0.pdf\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -364,7 +403,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 19\n}",
+							"raw": "{\n    \"product_id\": 31\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -408,7 +447,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"product_id\": 22,\n    \"quantity\": 1\n}",
+							"raw": "{\n    \"product_id\": 2,\n    \"quantity\": 12\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -733,6 +772,113 @@
 					"response": []
 				},
 				{
+					"name": "Get orders (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"limit\": 10,\n    \"page\": 1,\n    \"status\":\"\",\n    \"payment_method\":\"\",\n    \"order_by\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order detail (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/orders/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"orders",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get order summary (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/orders/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"orders",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Update status (Admin only)",
 					"request": {
 						"auth": {
@@ -766,44 +912,6 @@
 								"admin",
 								"orders",
 								"status"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get orders (Admin only)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"limit\": 10,\n    \"page\": 1,\n    \"status\":\"create\",\n    \"payment_method\":\"MOMO\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/v1/admin/orders",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"v1",
-								"admin",
-								"orders"
 							]
 						}
 					},

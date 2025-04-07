@@ -13,10 +13,28 @@ type IUserRepo interface {
 	GetProfile(ctx context.Context, userId int) (user database.GetUserProfileRow, err error)
 	FindByUserId(ctx context.Context, userID int) (user database.FindByUserIdRow, err error)
 	ChangePassword(ctx context.Context, newPassword string) (err error)
+	UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result sql.Result, err error)
 }
 
 type userRepo struct {
 	queries *database.Queries
+}
+
+// UpdateRole implements IUserRepo.
+func (ur *userRepo) UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result sql.Result, err error) {
+	result, err = ur.queries.UpdateRole(ctx, database.UpdateRoleParams{
+		ID:   int32(input.UserID),
+		Role: database.NullUserRole{UserRole: database.UserRole(input.Role), Valid: input.Role != ""},
+	})
+	if err != nil {
+		return result, err
+	}
+
+	if rows, _ := result.RowsAffected(); rows == 0 {
+		return result, sql.ErrNoRows
+	}
+
+	return result, nil
 }
 
 // GetProfile implements IUserRepo.
@@ -27,7 +45,6 @@ func (ur *userRepo) GetProfile(ctx context.Context, userId int) (user database.G
 	}
 
 	return user, nil
-
 }
 
 func (ur *userRepo) ChangePassword(ctx context.Context, newPassword string) (err error) {

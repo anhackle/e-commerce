@@ -24,4 +24,9 @@ WHERE id = ?;
 UPDATE `user`
 SET
     password = ?
-WHERE id = ?
+WHERE id = ?;
+
+-- name: UpdateRole :execresult
+UPDATE `user`
+SET role = ?
+WHERE id = ?;

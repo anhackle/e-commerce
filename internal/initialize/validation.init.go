@@ -15,5 +15,6 @@ func InitValidator() {
 		v.RegisterValidation("status", validation.ValidateStatus)
 		v.RegisterValidation("order_by", validation.ValidateOrderBy)
 		v.RegisterValidation("product_name", validation.ValidateProductName)
+		v.RegisterValidation("role", validation.ValidateUserRole)
 	}
 }

@@ -41,6 +41,18 @@ func (uc *UserController) ChangePassword(c *gin.Context) {
 	response.HandleResult(c, result, nil)
 }
 
+func (uc *UserController) UpdateRole(c *gin.Context) {
+	var input model.UpdateRoleInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	result, _ := uc.userService.UpdateRole(c, input)
+
+	response.HandleResult(c, result, nil)
+}
+
 func NewUserController(userService service.IUserService) *UserController {
 	return &UserController{
 		userService: userService,

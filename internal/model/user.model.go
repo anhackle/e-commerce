@@ -24,3 +24,15 @@ type UpdateRoleInput struct {
 	UserID int    `json:"user_id" binding:"required,numeric,min=0"`
 	Role   string `json:"role" binding:"required,role"`
 }
+
+type GetUsersForAdminInput struct {
+	Limit  int    `json:"limit" binding:"required,numeric,max=20,gt=0"`
+	Page   int    `json:"page" binding:"required,numeric,gt=0"`
+	Role   string `json:"role" binding:"role"`
+	Search string `json:"search" binding:"email_prefix,max=255,endsnotwith= ,startsnotwith= "`
+}
+type GetUsersForAdminOutput struct {
+	UserID int    `json:"user_id"`
+	Email  string `json:"email"`
+	Role   string `json:"role"`
+}

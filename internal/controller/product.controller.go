@@ -43,6 +43,7 @@ func (pc *ProductController) GetProducts(c *gin.Context) {
 	products, result, _ := pc.productService.GetProducts(c, input)
 	response.HandleResult(c, result, products)
 }
+
 func (pc *ProductController) CreateProduct(c *gin.Context) {
 	var input model.CreateProductInput
 	if err := c.ShouldBindJSON(&input); err != nil {

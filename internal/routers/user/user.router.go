@@ -26,5 +26,6 @@ func (ur *UserRouter) InitUserRouter(router *gin.RouterGroup) {
 	UserRouterPrivate.Use(middlewares.RoleVerifyMiddleware())
 	{
 		UserRouterPrivate.PUT("/role", userController.UpdateRole)
+		UserRouterPrivate.POST("/search", userController.GetUsersForAdmin)
 	}
 }

@@ -87,55 +87,6 @@ func (q *Queries) FindByUserId(ctx context.Context, id int32) (FindByUserIdRow, 
 	return i, err
 }
 
-const getUsersForAdmin = `-- name: GetUsersForAdmin :many
-SELECT id, email, role
-FROM ` + "`" + `user` + "`" + `
-WHERE role = ? and email LIKE ?
-ORDER BY created_at DESC
-LIMIT ?, ?
-`
-
-type GetUsersForAdminParams struct {
-	Role   NullUserRole
-	Email  string
-	Offset int32
-	Limit  int32
-}
-
-type GetUsersForAdminRow struct {
-	ID    int32
-	Email string
-	Role  NullUserRole
-}
-
-func (q *Queries) GetUsersForAdmin(ctx context.Context, arg GetUsersForAdminParams) ([]GetUsersForAdminRow, error) {
-	rows, err := q.db.QueryContext(ctx, getUsersForAdmin,
-		arg.Role,
-		arg.Email,
-		arg.Offset,
-		arg.Limit,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetUsersForAdminRow
-	for rows.Next() {
-		var i GetUsersForAdminRow
-		if err := rows.Scan(&i.ID, &i.Email, &i.Role); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const updatePassword = `-- name: UpdatePassword :execresult
 UPDATE ` + "`" + `user` + "`" + `
 SET

@@ -188,6 +188,7 @@ type User struct {
 	Password  string
 	Role      NullUserRole
 	CreatedAt sql.NullTime
+	DeletedAt sql.NullTime
 }
 
 type UserProfile struct {

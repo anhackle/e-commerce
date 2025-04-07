@@ -102,3 +102,18 @@ type UpdatePasswordParams struct {
 func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, updatePassword, arg.Password, arg.ID)
 }
+
+const updateRole = `-- name: UpdateRole :execresult
+UPDATE ` + "`" + `user` + "`" + `
+SET role = ?
+WHERE id = ?
+`
+
+type UpdateRoleParams struct {
+	Role NullUserRole
+	ID   int32
+}
+
+func (q *Queries) UpdateRole(ctx context.Context, arg UpdateRoleParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updateRole, arg.Role, arg.ID)
+}

@@ -19,3 +19,8 @@ type ChangePasswordInput struct {
 	NewPassword     string `json:"new_password" binding:"password"`
 	ConfirmPassword string `json:"confirm_password" binding:"password"`
 }
+
+type UpdateRoleInput struct {
+	UserID int    `json:"user_id" binding:"required,numeric,min=0"`
+	Role   string `json:"role" binding:"required,role"`
+}

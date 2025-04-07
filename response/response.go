@@ -58,6 +58,9 @@ func HandleResult(c *gin.Context, result int, data any) {
 
 	case ErrCodePaymentNotSuccess:
 		ErrorResponseInternal(c, result, nil)
+
+	case ErrCodeUserNotFound:
+		ErrorResponseExternal(c, result, nil)
 	}
 }
 

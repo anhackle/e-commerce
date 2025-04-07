@@ -14,6 +14,7 @@ const (
 	ErrCodeCartEmpty           = 40009
 	ErrCodeOrderNotFound       = 40010
 	ErrCodeStatusNotValid      = 40011
+	ErrCodeUserNotFound        = 40012
 	ErrCodeInternal            = 50000
 	ErrCodePaymentNotSuccess   = 50001
 )
@@ -35,4 +36,5 @@ var msg = map[int]string{
 	ErrCodeOrderNotFound:       "Order not found",
 	ErrCodeStatusNotValid:      "Status invalid",
 	ErrCodePaymentNotSuccess:   "Payment not success",
+	ErrCodeUserNotFound:        "User not found",
 }

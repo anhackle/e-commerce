@@ -15,10 +15,25 @@ type IUserService interface {
 	GetProfile(ctx context.Context) (profileResult model.GetProfileOutput, result int, err error)
 	UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (result int, err error)
 	ChangePassword(ctx context.Context, input model.ChangePasswordInput) (result int, err error)
+	UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result int, err error)
 }
 
 type userService struct {
 	userRepo repo.IUserRepo
+}
+
+// UpdateRole implements IUserService.
+func (us *userService) UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result int, err error) {
+	_, err = us.userRepo.UpdateRole(ctx, input)
+	if err == sql.ErrNoRows {
+		return response.ErrCodeUserNotFound, err
+	}
+
+	if err != nil {
+		return response.ErrCodeInternal, err
+	}
+
+	return response.ErrCodeSuccess, nil
 }
 
 // GetProfile implements IUserService.

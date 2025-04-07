@@ -27,7 +27,7 @@ func (q *Queries) GetUsersForAdmin(ctx context.Context, arg GetUsersForAdminPara
 	getUsersForAdmin.WriteString(`
 		SELECT id, email, role
 		FROM user
-		WHERE 1=1
+		WHERE deleted_at is NULL
 	`)
 
 	if arg.Role.Valid {

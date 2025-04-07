@@ -16,11 +16,26 @@ type IUserRepo interface {
 	ChangePassword(ctx context.Context, newPassword string) (err error)
 	UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result sql.Result, err error)
 	GetUsersForAdmin(ctx context.Context, input model.GetUsersForAdminInput) (users []dao.GetUsersForAdminRow, err error)
+	DeleteUser(ctx context.Context, input model.DeleteUserInput) (result sql.Result, err error)
 }
 
 type userRepo struct {
 	queries *database.Queries
 	dao     *dao.Queries
+}
+
+// DeleteUser implements IUserRepo.
+func (ur *userRepo) DeleteUser(ctx context.Context, input model.DeleteUserInput) (result sql.Result, err error) {
+	result, err = ur.queries.DeleteUser(ctx, int32(input.UserID))
+	if err != nil {
+		return result, err
+	}
+
+	if rows, _ := result.RowsAffected(); rows == 0 {
+		return result, sql.ErrNoRows
+	}
+
+	return result, nil
 }
 
 // GetUsersForAdmin implements IUserRepo.

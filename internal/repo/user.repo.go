@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/anle/codebase/internal/dao"
 	"github.com/anle/codebase/internal/database"
 	"github.com/anle/codebase/internal/model"
 )
@@ -14,10 +15,27 @@ type IUserRepo interface {
 	FindByUserId(ctx context.Context, userID int) (user database.FindByUserIdRow, err error)
 	ChangePassword(ctx context.Context, newPassword string) (err error)
 	UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result sql.Result, err error)
+	GetUsersForAdmin(ctx context.Context, input model.GetUsersForAdminInput) (users []dao.GetUsersForAdminRow, err error)
 }
 
 type userRepo struct {
 	queries *database.Queries
+	dao     *dao.Queries
+}
+
+// GetUsersForAdmin implements IUserRepo.
+func (ur *userRepo) GetUsersForAdmin(ctx context.Context, input model.GetUsersForAdminInput) (users []dao.GetUsersForAdminRow, err error) {
+	users, err = ur.dao.GetUsersForAdmin(ctx, dao.GetUsersForAdminParams{
+		Limit:  int32(input.Limit),
+		Offset: int32(input.Page),
+		Role:   dao.NullUserRole{UserRole: dao.UserRole(input.Role), Valid: input.Role != ""},
+		Email:  input.Search,
+	})
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
 }
 
 // UpdateRole implements IUserRepo.
@@ -86,5 +104,6 @@ func (ur *userRepo) FindByUserId(ctx context.Context, userID int) (user database
 func NewUserRepo(dbConn *sql.DB) IUserRepo {
 	return &userRepo{
 		queries: database.New(dbConn),
+		dao:     dao.New(dbConn),
 	}
 }

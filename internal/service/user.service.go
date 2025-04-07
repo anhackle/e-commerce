@@ -16,10 +16,30 @@ type IUserService interface {
 	UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (result int, err error)
 	ChangePassword(ctx context.Context, input model.ChangePasswordInput) (result int, err error)
 	UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result int, err error)
+	GetUsersForAdmin(ctx context.Context, input model.GetUsersForAdminInput) (users []model.GetUsersForAdminOutput, result int, err error)
 }
 
 type userService struct {
 	userRepo repo.IUserRepo
+}
+
+// GetUsersForAdmin implements IUserService.
+func (us *userService) GetUsersForAdmin(ctx context.Context, input model.GetUsersForAdminInput) (users []model.GetUsersForAdminOutput, result int, err error) {
+	input.Page = (input.Page - 1) * input.Limit
+	usersRepo, err := us.userRepo.GetUsersForAdmin(ctx, input)
+	if err != nil && err != sql.ErrNoRows {
+		return users, response.ErrCodeInternal, err
+	}
+
+	for _, user := range usersRepo {
+		users = append(users, model.GetUsersForAdminOutput{
+			UserID: int(user.ID),
+			Email:  user.Email,
+			Role:   string(user.Role.UserRole),
+		})
+	}
+
+	return users, response.ErrCodeSuccess, nil
 }
 
 // UpdateRole implements IUserService.

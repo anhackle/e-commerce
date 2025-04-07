@@ -10,6 +10,9 @@ func ValidateUserRole(fl validator.FieldLevel) bool {
 	var rolePattern = "^(admin|user)$"
 
 	role := fl.Field().String()
+	if role == "" {
+		return true
+	}
 
 	match, _ := regexp.MatchString(rolePattern, role)
 

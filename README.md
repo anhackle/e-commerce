@@ -20,7 +20,7 @@ docker compose up -d
 ```
 sudo apt update
 sudo apt install make -y
-curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | bash
+go install github.com/pressly/goose/v3/cmd/goose@latest
 ```
 ### 4. Configure your environment
 ```

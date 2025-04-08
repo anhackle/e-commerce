@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+
+# Logs
+storage/
+
+# Env files (secrets)
+.env
+*.env
+
+# Go build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+bin/
+
+# Output binaries
+main
+/app
+
+# Editor/IDE stuff
+.vscode/
+.idea/
+*.swp
+
+# Dependency cache
+vendor/
+
+# SQLC output cache (if not needed)
+internal/db/sqlc/testdata/
+
+# Wire generated (if you want to regen inside container)
+wire_gen.go
+
+# Unit tests
+tests/
+
+# Docker files (optional)
+dockerfile
+docker-compose.yml
+
+# Docs or Markdown (optional)
+README*
+docs/
+
+# Postman
+E-commerce.postman_collection.json

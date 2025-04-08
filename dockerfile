@@ -1,26 +1,24 @@
+# stage1: build
 FROM golang:1.23.3-alpine as builder
-WORKDIR /cungsao
-COPY . /cungsao
+WORKDIR /e-commerce
+COPY . /e-commerce
 
 ENV BUILD_TAG 1.0.0
 ENV GO111MODULE on
+# This disables CGO, which is Go’s support for calling C code.
 ENV CGO_ENABLED=0
+# Set the target operating system for Go’s compiler 
 ENV GOOS=linux
 RUN go mod tidy
-RUN go build -o cungsao /cungsao/cmd/server/main.go
+# go build with -ldflags to reduce binary size (strip debug info)
+RUN go build -ldflags="-s -w" -o e-commerce /e-commerce/cmd/server/main.go
 
-# stage2.1: rebuild
-FROM alpine
-WORKDIR /cungsao
-RUN apk add --no-cache \
-    ffmpeg \
-    build-base \
-    git \
-    bash
-COPY --from=builder /cungsao/cungsao /cungsao/cungsao
-COPY --from=builder /cungsao/zalo-audio/ /cungsao/zalo-audio/
-COPY --from=builder /cungsao/exported-file/ /cungsao/exported-file/
-COPY --from=builder /cungsao/config/production.yaml /cungsao/config/production.yaml
-COPY --from=builder /cungsao/config/dev.yaml /cungsao/config/dev.yaml
+# stage2.1: run
+FROM scratch
+WORKDIR /e-commerce
+COPY --from=builder /e-commerce/e-commerce /e-commerce/e-commerce
+COPY --from=builder /e-commerce/config/production.yaml /e-commerce/config/production.yaml
 
-CMD ["./cungsao"]
+EXPOSE 8082
+
+CMD ["./e-commerce"]

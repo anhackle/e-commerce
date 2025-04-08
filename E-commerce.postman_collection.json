@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\":\"admin.vn@gmail.com\",\n    \"password\": \"Abc@123\"\n}",
+							"raw": "{\n    \"email\":\"thai%nc.vn@gmail.com\",\n    \"password\": \"Abc@123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -71,7 +71,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin.vn@gmail.com\",\n    \"password\": \"Abc@123\"\n}",
+							"raw": "{\n    \"email\": \"thai_nc.vn@gmail.com\",\n    \"password\": \"Abc@123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -203,6 +203,113 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Update role (Admin only)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 2,\n    \"role\": \"user\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/user/role",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"user",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get users (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Limit\": 10,\n    \"Page\": 1,\n    \"Role\": \"\",\n    \"Search\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/user/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"user",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user (Admin only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 4\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/admin/user/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"admin",
+								"user",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"auth": {
@@ -286,7 +393,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"limit\": 10,\n    \"page\": 1,\n    \"min_price\":30000000,\n    \"max_price\":0,\n    \"search\":\"\"\n}",
+							"raw": "{\n    \"limit\": 10,\n    \"page\": 1,\n    \"min_price\":0,\n    \"max_price\":0,\n    \"search\":\"14 Pro\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

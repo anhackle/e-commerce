@@ -23,7 +23,7 @@ type GetUserProfileRow struct {
 	Address     sql.NullString
 }
 
-func (q *Queries) GetUserProfile(ctx context.Context, userID int32) (GetUserProfileRow, error) {
+func (q *Queries) GetUserProfile(ctx context.Context, userID string) (GetUserProfileRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserProfile, userID)
 	var i GetUserProfileRow
 	err := row.Scan(
@@ -50,7 +50,7 @@ type UpdateUserProfileParams struct {
 	LastName    sql.NullString
 	PhoneNumber sql.NullString
 	Address     sql.NullString
-	UserID      int32
+	UserID      string
 }
 
 func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (sql.Result, error) {

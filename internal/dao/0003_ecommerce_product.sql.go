@@ -15,7 +15,7 @@ type GetProductsWithSearchForAdminParams struct {
 }
 
 type GetProductsWithSearchForAdminRow struct {
-	ID          int32
+	ID          string
 	Name        string
 	Description sql.NullString
 	Price       int64

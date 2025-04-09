@@ -1,12 +1,13 @@
 -- name: CreateProduct :execresult
 INSERT INTO `product` (
+    id,
     name,
     description,
     price,
     quantity,
     image_url
 )
-VALUES (?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?);
 
 -- name: GetProducts :many
 SELECT id, name, description, price, quantity, image_url

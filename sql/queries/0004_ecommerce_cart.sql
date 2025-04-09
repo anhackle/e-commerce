@@ -1,10 +1,11 @@
 -- name: AddToCart :execresult
 INSERT INTO `cart` (
+    id,
     user_id,
     product_id,
     quantity
 )
-VALUES (?, ?, ?)
+VALUES (?, ?, ?, ?)
 ON DUPLICATE KEY 
 UPDATE
     quantity = quantity  + VALUES(quantity);

@@ -54,19 +54,18 @@ func (as *authenService) Register(ctx context.Context, input model.RegisterInput
 		Email:    input.Email,
 		Password: hashPassword,
 	}
-	sqlResult, err := txRepo.CreateUser(ctx, userInput)
+	userID, err := txRepo.CreateUser(ctx, userInput)
 	if err != nil {
 		tx.Rollback()
 		return response.ErrCodeInternal, err
 	}
 
-	userID, err := sqlResult.LastInsertId()
 	if err != nil {
 		tx.Rollback()
 		return response.ErrCodeInternal, err
 	}
 
-	err = txRepo.CreateUserProfile(ctx, int(userID))
+	err = txRepo.CreateUserProfile(ctx, userID)
 	if err != nil {
 		tx.Rollback()
 		return response.ErrCodeInternal, err
@@ -89,7 +88,7 @@ func (as *authenService) Login(ctx context.Context, input model.LoginInput) (tok
 		return "", response.ErrCodeNotAuthorize, nil
 	}
 
-	token, err = jwttoken.GenJWTToken(int(user.ID), string(user.Role.UserRole))
+	token, err = jwttoken.GenJWTToken(user.ID, string(user.Role.UserRole))
 	if err != nil {
 		return "", response.ErrCodeInternal, err
 	}

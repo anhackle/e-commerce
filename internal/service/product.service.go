@@ -31,7 +31,7 @@ func (ps *productService) GetProductsForAdmin(ctx context.Context, input model.G
 
 	for _, product := range productsRepo {
 		products = append(products, model.GetProductsForAdminOutput{
-			ID:          int(product.ID),
+			ID:          product.ID,
 			Name:        product.Name,
 			Description: product.Description.String,
 			Price:       int(product.Price),
@@ -84,7 +84,7 @@ func (ps *productService) GetProducts(ctx context.Context, input model.GetProduc
 
 	for _, product := range productsRepo {
 		products = append(products, model.GetProductsOutput{
-			ID:          int(product.ID),
+			ID:          product.ID,
 			Name:        product.Name,
 			Description: product.Description.String,
 			Price:       int(product.Price),
@@ -116,7 +116,7 @@ func (ps *productService) CreateProduct(ctx context.Context, input model.CreateP
 	// if product was not deleted --> update quantity = quantity + plus
 	if product.DeletedAt.Valid == false {
 		result, err = ps.UpdateProduct(ctx, model.UpdateProductInput{
-			ID:          int(product.ID),
+			ID:          product.ID,
 			Name:        input.Name,
 			Description: input.Description,
 			Price:       input.Price,
@@ -129,13 +129,13 @@ func (ps *productService) CreateProduct(ctx context.Context, input model.CreateP
 
 	// if product was deleted --> update deleted_at nul and quantity
 	// revive product
-	_, err = ps.productRepo.UpdateProductStatus(ctx, int(product.ID))
+	_, err = ps.productRepo.UpdateProductStatus(ctx, product.ID)
 	if err != nil {
 		return response.ErrCodeInternal, err
 	}
 
 	result, err = ps.UpdateProduct(ctx, model.UpdateProductInput{
-		ID:          int(product.ID),
+		ID:          product.ID,
 		Name:        input.Name,
 		Description: input.Description,
 		Price:       input.Price,

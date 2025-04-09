@@ -6,10 +6,11 @@ import (
 
 	"github.com/anle/codebase/internal/database"
 	"github.com/anle/codebase/internal/model"
+	uuidv4 "github.com/anle/codebase/internal/utils/uuid"
 )
 
 type ICartRepo interface {
-	AddToCart(ctx context.Context, input model.AddToCartInput) (result sql.Result, err error)
+	AddToCart(ctx context.Context, input model.AddToCartInput) (itemID string, err error)
 	GetCart(ctx context.Context) (cart []database.GetCartRow, err error)
 	DeleteCartByID(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error)
 	DeleteCart(ctx context.Context) (result sql.Result, err error)
@@ -23,7 +24,7 @@ type cartRepo struct {
 
 // DeleteCart implements ICartRepo.
 func (cr *cartRepo) DeleteCart(ctx context.Context) (result sql.Result, err error) {
-	result, err = cr.queries.DeleteCart(ctx, int32(ctx.Value("userID").(int)))
+	result, err = cr.queries.DeleteCart(ctx, ctx.Value("userID").(string))
 	if err != nil {
 		return result, err
 	}
@@ -41,9 +42,9 @@ func (cr *cartRepo) WithTx(tx *sql.Tx) ICartRepo {
 // UpdateCart implements ICartRepo.
 func (cr *cartRepo) UpdateCart(ctx context.Context, input model.UpdateCartInput) (result sql.Result, err error) {
 	result, err = cr.queries.UpdateCart(ctx, database.UpdateCartParams{
-		ID:        int32(input.ItemID),
-		UserID:    int32(ctx.Value("userID").(int)),
-		ProductID: int32(input.ProductID),
+		ID:        input.ItemID,
+		UserID:    ctx.Value("userID").(string),
+		ProductID: input.ProductID,
 		Quantity:  int32(*input.Quantity),
 	})
 	if err != nil {
@@ -61,8 +62,8 @@ func (cr *cartRepo) UpdateCart(ctx context.Context, input model.UpdateCartInput)
 // DeleteCart implements ICartRepo.
 func (cr *cartRepo) DeleteCartByID(ctx context.Context, input model.DeleteCartInput) (result sql.Result, err error) {
 	result, err = cr.queries.DeleteCartByID(ctx, database.DeleteCartByIDParams{
-		UserID: int32(ctx.Value("userID").(int)),
-		ID:     int32(input.ItemID),
+		UserID: ctx.Value("userID").(string),
+		ID:     input.ItemID,
 	})
 	if err != nil {
 		return result, err
@@ -76,22 +77,24 @@ func (cr *cartRepo) DeleteCartByID(ctx context.Context, input model.DeleteCartIn
 }
 
 // AddToCart implements ICartRepo.
-func (cr *cartRepo) AddToCart(ctx context.Context, input model.AddToCartInput) (result sql.Result, err error) {
-	result, err = cr.queries.AddToCart(ctx, database.AddToCartParams{
-		UserID:    int32(ctx.Value("userID").(int)),
-		ProductID: int32(input.ProductID),
+func (cr *cartRepo) AddToCart(ctx context.Context, input model.AddToCartInput) (itemID string, err error) {
+	itemID = uuidv4.GenerateUUID()
+	_, err = cr.queries.AddToCart(ctx, database.AddToCartParams{
+		ID:        itemID,
+		UserID:    ctx.Value("userID").(string),
+		ProductID: input.ProductID,
 		Quantity:  int32(input.Quantity),
 	})
 	if err != nil {
-		return result, err
+		return itemID, err
 	}
 
-	return result, nil
+	return itemID, nil
 }
 
 // GetCart implements ICartRepo.
 func (cr *cartRepo) GetCart(ctx context.Context) (cart []database.GetCartRow, err error) {
-	cart, err = cr.queries.GetCart(ctx, int32(ctx.Value("userID").(int)))
+	cart, err = cr.queries.GetCart(ctx, ctx.Value("userID").(string))
 	if err != nil {
 		return cart, err
 	}

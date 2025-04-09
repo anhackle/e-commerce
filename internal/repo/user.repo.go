@@ -11,8 +11,8 @@ import (
 
 type IUserRepo interface {
 	UpdateProfile(ctx context.Context, input model.UpdateProfileInput) (err error)
-	GetProfile(ctx context.Context, userId int) (user database.GetUserProfileRow, err error)
-	FindByUserId(ctx context.Context, userID int) (user database.FindByUserIdRow, err error)
+	GetProfile(ctx context.Context, userID string) (user database.GetUserProfileRow, err error)
+	FindByUserId(ctx context.Context, userID string) (user database.FindByUserIdRow, err error)
 	ChangePassword(ctx context.Context, newPassword string) (err error)
 	UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result sql.Result, err error)
 	GetUsersForAdmin(ctx context.Context, input model.GetUsersForAdminInput) (users []dao.GetUsersForAdminRow, err error)
@@ -26,7 +26,7 @@ type userRepo struct {
 
 // DeleteUser implements IUserRepo.
 func (ur *userRepo) DeleteUser(ctx context.Context, input model.DeleteUserInput) (result sql.Result, err error) {
-	result, err = ur.queries.DeleteUser(ctx, int32(input.UserID))
+	result, err = ur.queries.DeleteUser(ctx, input.UserID)
 	if err != nil {
 		return result, err
 	}
@@ -56,7 +56,7 @@ func (ur *userRepo) GetUsersForAdmin(ctx context.Context, input model.GetUsersFo
 // UpdateRole implements IUserRepo.
 func (ur *userRepo) UpdateRole(ctx context.Context, input model.UpdateRoleInput) (result sql.Result, err error) {
 	result, err = ur.queries.UpdateRole(ctx, database.UpdateRoleParams{
-		ID:   int32(input.UserID),
+		ID:   input.UserID,
 		Role: database.NullUserRole{UserRole: database.UserRole(input.Role), Valid: input.Role != ""},
 	})
 	if err != nil {
@@ -71,8 +71,8 @@ func (ur *userRepo) UpdateRole(ctx context.Context, input model.UpdateRoleInput)
 }
 
 // GetProfile implements IUserRepo.
-func (ur *userRepo) GetProfile(ctx context.Context, userId int) (user database.GetUserProfileRow, err error) {
-	user, err = ur.queries.GetUserProfile(ctx, int32(userId))
+func (ur *userRepo) GetProfile(ctx context.Context, userID string) (user database.GetUserProfileRow, err error) {
+	user, err = ur.queries.GetUserProfile(ctx, userID)
 	if err != nil {
 		return database.GetUserProfileRow{}, err
 	}
@@ -83,7 +83,7 @@ func (ur *userRepo) GetProfile(ctx context.Context, userId int) (user database.G
 func (ur *userRepo) ChangePassword(ctx context.Context, newPassword string) (err error) {
 	_, err = ur.queries.UpdatePassword(ctx, database.UpdatePasswordParams{
 		Password: newPassword,
-		ID:       int32(ctx.Value("userID").(int)),
+		ID:       ctx.Value("userID").(string),
 	})
 	if err != nil {
 		return err
@@ -98,7 +98,7 @@ func (ur *userRepo) UpdateProfile(ctx context.Context, input model.UpdateProfile
 		LastName:    sql.NullString{String: input.LastName, Valid: input.LastName != ""},
 		PhoneNumber: sql.NullString{String: input.PhoneNumber, Valid: input.PhoneNumber != ""},
 		Address:     sql.NullString{String: input.Address, Valid: input.Address != ""},
-		UserID:      int32(ctx.Value("userID").(int)),
+		UserID:      ctx.Value("userID").(string),
 	})
 	if err != nil {
 		return err
@@ -107,8 +107,8 @@ func (ur *userRepo) UpdateProfile(ctx context.Context, input model.UpdateProfile
 	return nil
 }
 
-func (ur *userRepo) FindByUserId(ctx context.Context, userID int) (user database.FindByUserIdRow, err error) {
-	user, err = ur.queries.FindByUserId(ctx, int32(userID))
+func (ur *userRepo) FindByUserId(ctx context.Context, userID string) (user database.FindByUserIdRow, err error) {
+	user, err = ur.queries.FindByUserId(ctx, userID)
 	if err != nil {
 		return database.FindByUserIdRow{}, err
 	}

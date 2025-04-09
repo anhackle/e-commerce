@@ -60,13 +60,13 @@ func (os *orderService) GetOrderForAdmin(ctx context.Context, input model.GetOrd
 		return orderDetail, response.ErrCodeInternal, err
 	}
 
-	items, err := os.orderRepo.GetOrderItems(ctx, int(order.ID))
+	items, err := os.orderRepo.GetOrderItems(ctx, order.ID)
 	if err != nil {
 		return orderDetail, response.ErrCodeInternal, err
 	}
 
 	orderDetail = model.GetOrderOutput{
-		OrderID:          int(order.ID),
+		OrderID:          order.ID,
 		CreatedAt:        order.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		Status:           string(order.Status.OrdersStatus),
 		ShippingAddreess: order.ShippingAddress,
@@ -155,7 +155,7 @@ func (os *orderService) GetOrdersForAdmin(ctx context.Context, input model.GetOr
 
 	for _, order := range ordersRepo {
 		orders = append(orders, model.GetOrdersForAdminOutput{
-			OrderID:          int(order.OrderID),
+			OrderID:          order.OrderID,
 			FirstName:        order.FirstName.String,
 			LastName:         order.LastName.String,
 			PhoneNumber:      order.PhoneNumber.String,
@@ -217,7 +217,7 @@ func (os *orderService) GetOrders(ctx context.Context, input model.GetOrdersInpu
 
 	for _, order := range ordersRepo {
 		orders = append(orders, model.GetOrdersOutput{
-			OrderID:          int(order.ID),
+			OrderID:          order.ID,
 			CreatedAt:        order.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 			Status:           string(order.Status.OrdersStatus),
 			ShippingAddreess: order.ShippingAddress,
@@ -263,10 +263,10 @@ func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrder
 
 	//3. Check Stock
 	var totalPrice int64 = 0
-	products := make(map[int32]database.GetProductByIDForUpdateRow)
+	products := make(map[string]database.GetProductByIDForUpdateRow)
 
 	for _, item := range cart {
-		product, err := os.productRepo.WithTx(tx).GetProductByIDForUpdate(ctx, int(item.ProductID))
+		product, err := os.productRepo.WithTx(tx).GetProductByIDForUpdate(ctx, item.ProductID)
 		if err == sql.ErrNoRows {
 			tx.Rollback()
 			return response.ErrCodeExternal, err
@@ -287,7 +287,7 @@ func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrder
 	}
 
 	//4. Create order
-	createOrderResult, err := os.orderRepo.WithTx(tx).CreateOrder(ctx, model.CreateOrderInput{
+	orderID, err := os.orderRepo.WithTx(tx).CreateOrder(ctx, model.CreateOrderInput{
 		PaymentMethod:   input.PaymentMethod,
 		ShippingAddress: input.ShippingAddress,
 		TotalPrice:      totalPrice,
@@ -298,15 +298,9 @@ func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrder
 	}
 
 	//5. Create order_items
-	orderID, err := createOrderResult.LastInsertId()
-	if err != nil {
-		tx.Rollback()
-		return response.ErrCodeInternal, err
-	}
-
 	for _, item := range cart {
 		_, err = os.orderRepo.WithTx(tx).CreateOrderItem(ctx, model.CreateOrderItemInput{
-			OrderID:     int32(orderID),
+			OrderID:     orderID,
 			Name:        products[item.ProductID].Name,
 			Description: products[item.ProductID].Description.String,
 			Price:       products[item.ProductID].Price,
@@ -319,7 +313,7 @@ func (os *orderService) CreateOrder(ctx context.Context, input model.CreateOrder
 		}
 
 		_, err = os.productRepo.WithTx(tx).UpdateProductByID(ctx, model.UpdateProductByIDInput{
-			ID:       int(item.ProductID),
+			ID:       item.ProductID,
 			Quantity: int(products[item.ProductID].Quantity) - int(item.Quantity),
 		})
 		if err != nil {
@@ -351,13 +345,13 @@ func (os *orderService) GetOrder(ctx context.Context, input model.GetOrderInput)
 		return orderDetail, response.ErrCodeInternal, err
 	}
 
-	items, err := os.orderRepo.GetOrderItems(ctx, int(order.ID))
+	items, err := os.orderRepo.GetOrderItems(ctx, order.ID)
 	if err != nil {
 		return orderDetail, response.ErrCodeInternal, err
 	}
 
 	orderDetail = model.GetOrderOutput{
-		OrderID:          int(order.ID),
+		OrderID:          order.ID,
 		CreatedAt:        order.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		Status:           string(order.Status.OrdersStatus),
 		ShippingAddreess: order.ShippingAddress,

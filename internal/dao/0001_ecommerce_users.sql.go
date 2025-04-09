@@ -13,7 +13,7 @@ type GetUsersForAdminParams struct {
 }
 
 type GetUsersForAdminRow struct {
-	ID    int32
+	ID    string
 	Email string
 	Role  NullUserRole
 }

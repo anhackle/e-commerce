@@ -12,6 +12,7 @@ import (
 
 const createOrderItem = `-- name: CreateOrderItem :execresult
 INSERT INTO ` + "`" + `order_item` + "`" + `(
+    id,
     order_id,
     name,
     description,
@@ -19,11 +20,12 @@ INSERT INTO ` + "`" + `order_item` + "`" + `(
     quantity,
     image_url
 )
-VALUES(?, ?, ?, ?, ?, ?)
+VALUES(?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateOrderItemParams struct {
-	OrderID     int32
+	ID          string
+	OrderID     string
 	Name        string
 	Description sql.NullString
 	Price       int64
@@ -33,6 +35,7 @@ type CreateOrderItemParams struct {
 
 func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, createOrderItem,
+		arg.ID,
 		arg.OrderID,
 		arg.Name,
 		arg.Description,
@@ -61,7 +64,7 @@ type GetOrderItemsRow struct {
 	ImageUrl    string
 }
 
-func (q *Queries) GetOrderItems(ctx context.Context, orderID int32) ([]GetOrderItemsRow, error) {
+func (q *Queries) GetOrderItems(ctx context.Context, orderID string) ([]GetOrderItemsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOrderItems, orderID)
 	if err != nil {
 		return nil, err

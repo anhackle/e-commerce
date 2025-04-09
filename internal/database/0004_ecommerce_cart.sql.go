@@ -12,24 +12,31 @@ import (
 
 const addToCart = `-- name: AddToCart :execresult
 INSERT INTO ` + "`" + `cart` + "`" + ` (
+    id,
     user_id,
     product_id,
     quantity
 )
-VALUES (?, ?, ?)
+VALUES (?, ?, ?, ?)
 ON DUPLICATE KEY 
 UPDATE
     quantity = quantity  + VALUES(quantity)
 `
 
 type AddToCartParams struct {
-	UserID    int32
-	ProductID int32
+	ID        string
+	UserID    string
+	ProductID string
 	Quantity  int32
 }
 
 func (q *Queries) AddToCart(ctx context.Context, arg AddToCartParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, addToCart, arg.UserID, arg.ProductID, arg.Quantity)
+	return q.db.ExecContext(ctx, addToCart,
+		arg.ID,
+		arg.UserID,
+		arg.ProductID,
+		arg.Quantity,
+	)
 }
 
 const deleteCart = `-- name: DeleteCart :execresult
@@ -39,7 +46,7 @@ WHERE
     user_id = ?
 `
 
-func (q *Queries) DeleteCart(ctx context.Context, userID int32) (sql.Result, error) {
+func (q *Queries) DeleteCart(ctx context.Context, userID string) (sql.Result, error) {
 	return q.db.ExecContext(ctx, deleteCart, userID)
 }
 
@@ -51,8 +58,8 @@ WHERE
 `
 
 type DeleteCartByIDParams struct {
-	UserID int32
-	ID     int32
+	UserID string
+	ID     string
 }
 
 func (q *Queries) DeleteCartByID(ctx context.Context, arg DeleteCartByIDParams) (sql.Result, error) {
@@ -75,15 +82,15 @@ WHERE
 `
 
 type GetCartRow struct {
-	CartID       int32
-	ProductID    int32
+	CartID       string
+	ProductID    string
 	ProductName  string
 	Quantity     int32
 	ImageUrl     string
 	ProductPrice int64
 }
 
-func (q *Queries) GetCart(ctx context.Context, userID int32) ([]GetCartRow, error) {
+func (q *Queries) GetCart(ctx context.Context, userID string) ([]GetCartRow, error) {
 	rows, err := q.db.QueryContext(ctx, getCart, userID)
 	if err != nil {
 		return nil, err
@@ -122,9 +129,9 @@ WHERE
 
 type UpdateCartParams struct {
 	Quantity  int32
-	ID        int32
-	UserID    int32
-	ProductID int32
+	ID        string
+	UserID    string
+	ProductID string
 }
 
 func (q *Queries) UpdateCart(ctx context.Context, arg UpdateCartParams) (sql.Result, error) {

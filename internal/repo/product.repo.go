@@ -6,22 +6,23 @@ import (
 
 	"github.com/anle/codebase/internal/dao"
 	"github.com/anle/codebase/internal/database"
+	uuidv4 "github.com/anle/codebase/internal/utils/uuid"
 
 	"github.com/anle/codebase/internal/model"
 )
 
 type IProductRepo interface {
-	CreateProduct(ctx context.Context, input model.CreateProductInput) (result sql.Result, err error)
+	CreateProduct(ctx context.Context, input model.CreateProductInput) (productID string, err error)
 	UpdateProduct(ctx context.Context, input model.UpdateProductInput) (result sql.Result, err error)
-	UpdateProductStatus(ctx context.Context, id int) (result sql.Result, err error)
+	UpdateProductStatus(ctx context.Context, productID string) (result sql.Result, err error)
 	UpdateProductByID(ctx context.Context, input model.UpdateProductByIDInput) (result sql.Result, err error)
 	DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result sql.Result, err error)
 	GetProducts(ctx context.Context, input model.GetProductsInput) (products []database.GetProductsRow, err error)
 	GetProductsWithSearchForAdmin(ctx context.Context, input model.GetProductsForAdminInput) (products []dao.GetProductsWithSearchForAdminRow, err error)
-	GetProductByID(ctx context.Context, productID int) (product database.GetProductByIDRow, err error)
-	GetProductByIDForUpdate(ctx context.Context, productID int) (product database.GetProductByIDForUpdateRow, err error)
+	GetProductByID(ctx context.Context, productID string) (product database.GetProductByIDRow, err error)
+	GetProductByIDForUpdate(ctx context.Context, productID string) (product database.GetProductByIDForUpdateRow, err error)
 	GetProductForCreate(ctx context.Context, input model.CreateProductInput) (product database.GetProductForCreateRow, err error)
-	GetQuantity(ctx context.Context, productID int) (quantity int32, err error)
+	GetQuantity(ctx context.Context, productID string) (quantity int32, err error)
 	WithTx(tx *sql.Tx) IProductRepo
 }
 
@@ -47,8 +48,8 @@ func (pr *productRepo) GetProductsWithSearchForAdmin(ctx context.Context, input 
 }
 
 // UpdateProductStatus implements IProductRepo.
-func (pr *productRepo) UpdateProductStatus(ctx context.Context, id int) (result sql.Result, err error) {
-	result, err = pr.queries.UpdateProductStatus(ctx, int32(id))
+func (pr *productRepo) UpdateProductStatus(ctx context.Context, productID string) (result sql.Result, err error) {
+	result, err = pr.queries.UpdateProductStatus(ctx, productID)
 	if err != nil {
 		return result, err
 	}
@@ -72,7 +73,7 @@ func (pr *productRepo) GetProductForCreate(ctx context.Context, input model.Crea
 // UpdateProductByID implements IProductRepo.
 func (pr *productRepo) UpdateProductByID(ctx context.Context, input model.UpdateProductByIDInput) (result sql.Result, err error) {
 	result, err = pr.queries.UpdateQuantity(ctx, database.UpdateQuantityParams{
-		ID:       int32(input.ID),
+		ID:       input.ID,
 		Quantity: int32(input.Quantity),
 	})
 	if err != nil {
@@ -90,8 +91,8 @@ func (pr *productRepo) WithTx(tx *sql.Tx) IProductRepo {
 }
 
 // GetProductByIDForUpdate implements IProductRepo.
-func (pr *productRepo) GetProductByIDForUpdate(ctx context.Context, productID int) (product database.GetProductByIDForUpdateRow, err error) {
-	product, err = pr.queries.GetProductByIDForUpdate(ctx, int32(productID))
+func (pr *productRepo) GetProductByIDForUpdate(ctx context.Context, productID string) (product database.GetProductByIDForUpdateRow, err error) {
+	product, err = pr.queries.GetProductByIDForUpdate(ctx, productID)
 	if err != nil {
 		return product, err
 	}
@@ -100,8 +101,8 @@ func (pr *productRepo) GetProductByIDForUpdate(ctx context.Context, productID in
 }
 
 // GetProductByID implements IProductRepo.
-func (pr *productRepo) GetProductByID(ctx context.Context, productID int) (product database.GetProductByIDRow, err error) {
-	product, err = pr.queries.GetProductByID(ctx, int32(productID))
+func (pr *productRepo) GetProductByID(ctx context.Context, productID string) (product database.GetProductByIDRow, err error) {
+	product, err = pr.queries.GetProductByID(ctx, productID)
 	if err != nil {
 		return product, err
 	}
@@ -110,8 +111,8 @@ func (pr *productRepo) GetProductByID(ctx context.Context, productID int) (produ
 }
 
 // GetQuantity implements IProductRepo.
-func (pr *productRepo) GetQuantity(ctx context.Context, productID int) (quantity int32, err error) {
-	quantity, err = pr.queries.GetQuantity(ctx, int32(productID))
+func (pr *productRepo) GetQuantity(ctx context.Context, productID string) (quantity int32, err error) {
+	quantity, err = pr.queries.GetQuantity(ctx, (productID))
 	if err != nil {
 		return quantity, err
 	}
@@ -121,7 +122,7 @@ func (pr *productRepo) GetQuantity(ctx context.Context, productID int) (quantity
 
 // DeleteProduct implements IProductRepo.
 func (pr *productRepo) DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result sql.Result, err error) {
-	result, err = pr.queries.DeleteProduct(ctx, int32(input.ID))
+	result, err = pr.queries.DeleteProduct(ctx, input.ID)
 	if err != nil {
 		return result, err
 	}
@@ -136,7 +137,7 @@ func (pr *productRepo) DeleteProduct(ctx context.Context, input model.DeleteProd
 // UpdateProduct implements IProductRepo.
 func (pr *productRepo) UpdateProduct(ctx context.Context, input model.UpdateProductInput) (result sql.Result, err error) {
 	result, err = pr.queries.UpdateProduct(ctx, database.UpdateProductParams{
-		ID:          int32(input.ID),
+		ID:          input.ID,
 		Name:        input.Name,
 		Description: sql.NullString{String: input.Description, Valid: input.Description != ""},
 		Price:       int64(input.Price),
@@ -168,8 +169,10 @@ func (pr *productRepo) GetProducts(ctx context.Context, input model.GetProductsI
 }
 
 // CreateProduct implements IProductRepo.
-func (pr *productRepo) CreateProduct(ctx context.Context, input model.CreateProductInput) (result sql.Result, err error) {
-	result, err = pr.queries.CreateProduct(ctx, database.CreateProductParams{
+func (pr *productRepo) CreateProduct(ctx context.Context, input model.CreateProductInput) (productID string, err error) {
+	productID = uuidv4.GenerateUUID()
+	_, err = pr.queries.CreateProduct(ctx, database.CreateProductParams{
+		ID:          productID,
 		Name:        input.Name,
 		Description: sql.NullString{String: input.Description, Valid: input.Description != ""},
 		Price:       int64(input.Price),
@@ -177,10 +180,10 @@ func (pr *productRepo) CreateProduct(ctx context.Context, input model.CreateProd
 		ImageUrl:    input.ImageURL,
 	})
 	if err != nil {
-		return result, err
+		return productID, err
 	}
 
-	return result, nil
+	return productID, nil
 }
 
 func NewProductRepo(dbConn *sql.DB) IProductRepo {

@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS cart (
-    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
-    user_id INT NOT NULL,
-    product_id INT NOT NULL,
+    id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
+    product_id CHAR(36) NOT NULL,
     quantity INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (product_id) REFERENCES product(id),

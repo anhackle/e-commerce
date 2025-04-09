@@ -106,8 +106,8 @@ func (cs *cartService) GetCart(ctx context.Context) (cart []model.GetCartOutput,
 
 	for _, item := range cartItems {
 		cart = append(cart, model.GetCartOutput{
-			CartID:    int(item.CartID),
-			ProductID: int(item.ProductID),
+			CartID:    item.CartID,
+			ProductID: item.ProductID,
 			Name:      item.ProductName,
 			Price:     int(item.ProductPrice),
 			Quantity:  int(item.Quantity),

@@ -21,7 +21,7 @@ type ChangePasswordInput struct {
 }
 
 type UpdateRoleInput struct {
-	UserID int    `json:"user_id" binding:"required,numeric,min=0"`
+	UserID string `json:"user_id" binding:"required,uuid"`
 	Role   string `json:"role" binding:"required,role"`
 }
 
@@ -32,11 +32,11 @@ type GetUsersForAdminInput struct {
 	Search string `json:"search" binding:"email_prefix,max=255,endsnotwith= ,startsnotwith= "`
 }
 type GetUsersForAdminOutput struct {
-	UserID int    `json:"user_id"`
+	UserID string `json:"user_id"`
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 }
 
 type DeleteUserInput struct {
-	UserID int `json:"user_id" binding:"required,numeric,min=0"`
+	UserID string `json:"user_id" binding:"required,uuid"`
 }

@@ -1,13 +1,13 @@
 package model
 
 type AddToCartInput struct {
-	ProductID int `json:"product_id" binding:"required,numeric,min=0"`
-	Quantity  int `json:"quantity" binding:"required,numeric"`
+	ProductID string `json:"product_id" binding:"required,uuid"`
+	Quantity  int    `json:"quantity" binding:"required,numeric"`
 }
 
 type GetCartOutput struct {
-	CartID    int    `json:"item_id"`
-	ProductID int    `json:"product_id"`
+	CartID    string `json:"item_id"`
+	ProductID string `json:"product_id"`
 	Name      string `json:"product_name"`
 	Price     int    `json:"price"`
 	Quantity  int    `json:"quantity"`
@@ -16,11 +16,11 @@ type GetCartOutput struct {
 }
 
 type DeleteCartInput struct {
-	ItemID int `json:"item_id" binding:"required,numeric,min=0"`
+	ItemID string `json:"item_id" binding:"required,uuid"`
 }
 
 type UpdateCartInput struct {
-	ItemID    int  `json:"item_id" binding:"required,numeric,min=0"`
-	ProductID int  `json:"product_id" binding:"required,numeric,min=0"`
-	Quantity  *int `json:"quantity" binding:"required,numeric,min=0"`
+	ItemID    string `json:"item_id" binding:"required,uuid"`
+	ProductID string `json:"product_id" binding:"required,uuid"`
+	Quantity  *int   `json:"quantity" binding:"required,numeric,min=0"`
 }

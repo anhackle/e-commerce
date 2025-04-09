@@ -17,5 +17,6 @@ func InitValidator() {
 		v.RegisterValidation("product_name", validation.ValidateProductName)
 		v.RegisterValidation("role", validation.ValidateUserRole)
 		v.RegisterValidation("email_prefix", validation.ValidateEmailPrefix)
+		v.RegisterValidation("uuid", validation.ValidateUUID)
 	}
 }

@@ -48,7 +48,7 @@ func (us *userService) GetUsersForAdmin(ctx context.Context, input model.GetUser
 
 	for _, user := range usersRepo {
 		users = append(users, model.GetUsersForAdminOutput{
-			UserID: int(user.ID),
+			UserID: user.ID,
 			Email:  user.Email,
 			Role:   string(user.Role.UserRole),
 		})
@@ -73,7 +73,7 @@ func (us *userService) UpdateRole(ctx context.Context, input model.UpdateRoleInp
 
 // GetProfile implements IUserService.
 func (us *userService) GetProfile(ctx context.Context) (profileResult model.GetProfileOutput, result int, err error) {
-	user, err := us.userRepo.GetProfile(ctx, ctx.Value("userID").(int))
+	user, err := us.userRepo.GetProfile(ctx, ctx.Value("userID").(string))
 	if err != nil {
 		return profileResult, response.ErrCodeInternal, err
 	}
@@ -98,7 +98,7 @@ func (us *userService) UpdateProfile(ctx context.Context, input model.UpdateProf
 }
 
 func (us *userService) ChangePassword(ctx context.Context, input model.ChangePasswordInput) (result int, err error) {
-	user, err := us.userRepo.FindByUserId(ctx, ctx.Value("userID").(int))
+	user, err := us.userRepo.FindByUserId(ctx, ctx.Value("userID").(string))
 	if err != nil && err != sql.ErrNoRows {
 		return response.ErrCodeInternal, err
 	}

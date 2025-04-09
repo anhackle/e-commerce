@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS product (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
+    id CHAR(36) PRIMARY KEY,
+    name VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    description TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
     price BIGINT NOT NULL,
     quantity INT NOT NULL,
     image_url TEXT NOT NULL,
@@ -11,8 +11,7 @@ CREATE TABLE IF NOT EXISTS product (
     deleted_at TIMESTAMP NULL DEFAULT NULL,
     UNIQUE INDEX unique_product (name, price),
     FULLTEXT INDEX idx_name_desc (name)
-
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
 -- +goose StatementEnd
 
 -- +goose Down

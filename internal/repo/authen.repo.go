@@ -6,11 +6,12 @@ import (
 
 	"github.com/anle/codebase/internal/database"
 	"github.com/anle/codebase/internal/model"
+	uuidv4 "github.com/anle/codebase/internal/utils/uuid"
 )
 
 type IAuthenRepo interface {
-	CreateUser(ctx context.Context, input model.RegisterInput) (result sql.Result, err error)
-	CreateUserProfile(ctx context.Context, userID int) (err error)
+	CreateUser(ctx context.Context, input model.RegisterInput) (userID string, err error)
+	CreateUserProfile(ctx context.Context, userID string) (err error)
 	FindByEmail(ctx context.Context, input string) (user database.FindByEmailRow, err error)
 	WithTx(tx *sql.Tx) IAuthenRepo
 }
@@ -26,8 +27,11 @@ func (ar *authenRepo) WithTx(tx *sql.Tx) IAuthenRepo {
 }
 
 // CreateUserProfile implements IAuthenRepo.
-func (ar *authenRepo) CreateUserProfile(ctx context.Context, userID int) (err error) {
-	_, err = ar.queries.CreateUserProfile(ctx, int32(userID))
+func (ar *authenRepo) CreateUserProfile(ctx context.Context, userID string) (err error) {
+	_, err = ar.queries.CreateUserProfile(ctx, database.CreateUserProfileParams{
+		ID:     uuidv4.GenerateUUID(),
+		UserID: userID,
+	})
 	if err != nil {
 		return err
 	}
@@ -35,16 +39,18 @@ func (ar *authenRepo) CreateUserProfile(ctx context.Context, userID int) (err er
 	return nil
 }
 
-func (ar *authenRepo) CreateUser(ctx context.Context, input model.RegisterInput) (result sql.Result, err error) {
-	result, err = ar.queries.CreateUser(ctx, database.CreateUserParams{
+func (ar *authenRepo) CreateUser(ctx context.Context, input model.RegisterInput) (userID string, err error) {
+	userID = uuidv4.GenerateUUID()
+	_, err = ar.queries.CreateUser(ctx, database.CreateUserParams{
+		ID:       userID,
 		Email:    input.Email,
 		Password: input.Password,
 	})
 	if err != nil {
-		return result, err
+		return userID, err
 	}
 
-	return result, nil
+	return userID, nil
 }
 
 func (ar *authenRepo) FindByEmail(ctx context.Context, input string) (user database.FindByEmailRow, err error) {

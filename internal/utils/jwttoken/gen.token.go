@@ -7,7 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenJWTToken(userID int, role string) (token string, err error) {
+func GenJWTToken(userID string, role string) (token string, err error) {
 	mySigningKey := []byte(global.Config.JWT.Key)
 
 	claims := JWTClaims{

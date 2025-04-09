@@ -9,7 +9,7 @@ type CreateProductInput struct {
 }
 
 type UpdateProductInput struct {
-	ID          int    `json:"product_id" binding:"required,numeric,min=0"`
+	ID          string `json:"product_id" binding:"required,uuid"`
 	Name        string `json:"name" binding:"required,product_name,max=255,endsnotwith= ,startsnotwith= "`
 	Description string `json:"description" binding:"required,endsnotwith= ,startsnotwith= "`
 	Price       int    `json:"price" binding:"required,numeric,min=0"`
@@ -19,12 +19,12 @@ type UpdateProductInput struct {
 
 // Internal input => Not need binding
 type UpdateProductByIDInput struct {
-	ID       int
+	ID       string
 	Quantity int
 }
 
 type DeleteProductInput struct {
-	ID int `json:"product_id" binding:"required,numeric,min=0"`
+	ID string `json:"product_id" binding:"required,uuid"`
 }
 
 type GetProductsInput struct {
@@ -33,7 +33,7 @@ type GetProductsInput struct {
 }
 
 type GetProductsOutput struct {
-	ID          int    `json:"product_id"`
+	ID          string `json:"product_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`
@@ -50,7 +50,7 @@ type GetProductsForAdminInput struct {
 }
 
 type GetProductsForAdminOutput struct {
-	ID          int    `json:"product_id"`
+	ID          string `json:"product_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`

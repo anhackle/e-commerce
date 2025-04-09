@@ -1,14 +1,14 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS user_profile (
-    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL UNIQUE,
-    user_id INT NOT NULL,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
+    id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
+    first_name VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    last_name VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
     phone_number VARCHAR(15),
-    address VARCHAR(255),
+    address TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
     FOREIGN KEY (user_id) REFERENCES user(id)
-)CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+);
 -- +goose StatementEnd
 
 -- +goose Down

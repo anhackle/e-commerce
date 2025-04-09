@@ -1,5 +1,6 @@
 -- name: CreateOrderItem :execresult
 INSERT INTO `order_item`(
+    id,
     order_id,
     name,
     description,
@@ -7,7 +8,7 @@ INSERT INTO `order_item`(
     quantity,
     image_url
 )
-VALUES(?, ?, ?, ?, ?, ?);
+VALUES(?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetOrderItems :many
 SELECT

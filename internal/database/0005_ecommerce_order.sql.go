@@ -12,16 +12,18 @@ import (
 
 const createOrder = `-- name: CreateOrder :execresult
 INSERT INTO ` + "`" + `orders` + "`" + `(
+    id,
     user_id,
     payment_method,
     shipping_address,
     total
 )
-VALUES(?, ?, ?, ?)
+VALUES(?, ?, ?, ?, ?)
 `
 
 type CreateOrderParams struct {
-	UserID          int32
+	ID              string
+	UserID          string
 	PaymentMethod   OrdersPaymentMethod
 	ShippingAddress string
 	Total           int64
@@ -29,6 +31,7 @@ type CreateOrderParams struct {
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, createOrder,
+		arg.ID,
 		arg.UserID,
 		arg.PaymentMethod,
 		arg.ShippingAddress,
@@ -49,12 +52,12 @@ WHERE id = ? AND user_id = ?
 `
 
 type GetOrderParams struct {
-	ID     int32
-	UserID int32
+	ID     string
+	UserID string
 }
 
 type GetOrderRow struct {
-	ID              int32
+	ID              string
 	CreatedAt       sql.NullTime
 	Status          NullOrdersStatus
 	ShippingAddress string
@@ -89,7 +92,7 @@ WHERE id = ?
 `
 
 type GetOrderForAdminRow struct {
-	ID              int32
+	ID              string
 	CreatedAt       sql.NullTime
 	Status          NullOrdersStatus
 	ShippingAddress string
@@ -97,7 +100,7 @@ type GetOrderForAdminRow struct {
 	Total           int64
 }
 
-func (q *Queries) GetOrderForAdmin(ctx context.Context, id int32) (GetOrderForAdminRow, error) {
+func (q *Queries) GetOrderForAdmin(ctx context.Context, id string) (GetOrderForAdminRow, error) {
 	row := q.db.QueryRowContext(ctx, getOrderForAdmin, id)
 	var i GetOrderForAdminRow
 	err := row.Scan(
@@ -118,8 +121,8 @@ WHERE id = ? AND user_id = ?
 `
 
 type GetOrderStatusParams struct {
-	ID     int32
-	UserID int32
+	ID     string
+	UserID string
 }
 
 func (q *Queries) GetOrderStatus(ctx context.Context, arg GetOrderStatusParams) (NullOrdersStatus, error) {
@@ -183,13 +186,13 @@ OFFSET ?
 `
 
 type GetOrdersParams struct {
-	UserID int32
+	UserID string
 	Limit  int32
 	Offset int32
 }
 
 type GetOrdersRow struct {
-	ID              int32
+	ID              string
 	CreatedAt       sql.NullTime
 	Status          NullOrdersStatus
 	ShippingAddress string
@@ -265,8 +268,8 @@ type GetOrdersForAdminParams struct {
 }
 
 type GetOrdersForAdminRow struct {
-	UserID          int32
-	OrderID         int32
+	UserID          string
+	OrderID         string
 	FirstName       sql.NullString
 	LastName        sql.NullString
 	PhoneNumber     sql.NullString
@@ -328,7 +331,7 @@ WHERE id = ?
 
 type UpdateStatusParams struct {
 	Status NullOrdersStatus
-	ID     int32
+	ID     string
 }
 
 func (q *Queries) UpdateStatus(ctx context.Context, arg UpdateStatusParams) (sql.Result, error) {

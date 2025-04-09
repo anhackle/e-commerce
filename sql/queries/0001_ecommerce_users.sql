@@ -1,9 +1,10 @@
 -- name: CreateUser :execresult
 INSERT INTO `user` (
+    id,
     email,
     password
 )
-VALUES (?, ?);
+VALUES (?, ?, ?);
 
 -- name: FindByEmail :one
 SELECT id, email, password, role
@@ -12,8 +13,8 @@ WHERE email = ? AND deleted_at IS NULL;
 
 -- name: CreateUserProfile :execresult
 INSERT INTO `user_profile` (
-    user_id
-) VALUES (?);
+    id, user_id
+) VALUES (?, ?);
 
 -- name: FindByUserId :one
 SELECT id, email, password, role

@@ -12,29 +12,36 @@ import (
 
 const createUser = `-- name: CreateUser :execresult
 INSERT INTO ` + "`" + `user` + "`" + ` (
+    id,
     email,
     password
 )
-VALUES (?, ?)
+VALUES (?, ?, ?)
 `
 
 type CreateUserParams struct {
+	ID       string
 	Email    string
 	Password string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createUser, arg.Email, arg.Password)
+	return q.db.ExecContext(ctx, createUser, arg.ID, arg.Email, arg.Password)
 }
 
 const createUserProfile = `-- name: CreateUserProfile :execresult
 INSERT INTO ` + "`" + `user_profile` + "`" + ` (
-    user_id
-) VALUES (?)
+    id, user_id
+) VALUES (?, ?)
 `
 
-func (q *Queries) CreateUserProfile(ctx context.Context, userID int32) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createUserProfile, userID)
+type CreateUserProfileParams struct {
+	ID     string
+	UserID string
+}
+
+func (q *Queries) CreateUserProfile(ctx context.Context, arg CreateUserProfileParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, createUserProfile, arg.ID, arg.UserID)
 }
 
 const deleteUser = `-- name: DeleteUser :execresult
@@ -43,7 +50,7 @@ SET deleted_at = NOW()
 WHERE id = ? AND deleted_at IS NULL
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id int32) (sql.Result, error) {
+func (q *Queries) DeleteUser(ctx context.Context, id string) (sql.Result, error) {
 	return q.db.ExecContext(ctx, deleteUser, id)
 }
 
@@ -54,7 +61,7 @@ WHERE email = ? AND deleted_at IS NULL
 `
 
 type FindByEmailRow struct {
-	ID       int32
+	ID       string
 	Email    string
 	Password string
 	Role     NullUserRole
@@ -79,13 +86,13 @@ WHERE id = ? AND deleted_at IS NULL
 `
 
 type FindByUserIdRow struct {
-	ID       int32
+	ID       string
 	Email    string
 	Password string
 	Role     NullUserRole
 }
 
-func (q *Queries) FindByUserId(ctx context.Context, id int32) (FindByUserIdRow, error) {
+func (q *Queries) FindByUserId(ctx context.Context, id string) (FindByUserIdRow, error) {
 	row := q.db.QueryRowContext(ctx, findByUserId, id)
 	var i FindByUserIdRow
 	err := row.Scan(
@@ -106,7 +113,7 @@ WHERE id = ? AND deleted_at IS NULL
 
 type UpdatePasswordParams struct {
 	Password string
-	ID       int32
+	ID       string
 }
 
 func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (sql.Result, error) {
@@ -121,7 +128,7 @@ WHERE id = ? AND deleted_at IS NULL
 
 type UpdateRoleParams struct {
 	Role NullUserRole
-	ID   int32
+	ID   string
 }
 
 func (q *Queries) UpdateRole(ctx context.Context, arg UpdateRoleParams) (sql.Result, error) {

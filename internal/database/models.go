@@ -143,15 +143,15 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 }
 
 type Cart struct {
-	ID        int32
-	UserID    int32
-	ProductID int32
+	ID        string
+	UserID    string
+	ProductID string
 	Quantity  int32
 }
 
 type Order struct {
-	ID              int32
-	UserID          int32
+	ID              string
+	UserID          string
 	PaymentMethod   OrdersPaymentMethod
 	Status          NullOrdersStatus
 	CreatedAt       sql.NullTime
@@ -161,8 +161,8 @@ type Order struct {
 }
 
 type OrderItem struct {
-	ID          int32
-	OrderID     int32
+	ID          string
+	OrderID     string
 	Name        string
 	Description sql.NullString
 	Price       int64
@@ -172,7 +172,7 @@ type OrderItem struct {
 }
 
 type Product struct {
-	ID          int32
+	ID          string
 	Name        string
 	Description sql.NullString
 	Price       int64
@@ -183,7 +183,7 @@ type Product struct {
 }
 
 type User struct {
-	ID        int32
+	ID        string
 	Email     string
 	Password  string
 	Role      NullUserRole
@@ -192,8 +192,8 @@ type User struct {
 }
 
 type UserProfile struct {
-	ID          int32
-	UserID      int32
+	ID          string
+	UserID      string
 	FirstName   sql.NullString
 	LastName    sql.NullString
 	PhoneNumber sql.NullString

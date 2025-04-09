@@ -8,14 +8,15 @@ import (
 
 	"github.com/anle/codebase/internal/database"
 	"github.com/anle/codebase/internal/model"
+	uuidv4 "github.com/anle/codebase/internal/utils/uuid"
 )
 
 type IOrderRepo interface {
 	GetOrders(ctx context.Context, input model.GetOrdersInput) (result []database.GetOrdersRow, err error)
 	GetOrder(ctx context.Context, input model.GetOrderInput) (result database.GetOrderRow, err error)
-	GetOrderItems(ctx context.Context, orderID int) (result []database.GetOrderItemsRow, err error)
-	CreateOrder(ctx context.Context, input model.CreateOrderInput) (result sql.Result, err error)
-	CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (result sql.Result, err error)
+	GetOrderItems(ctx context.Context, orderID string) (result []database.GetOrderItemsRow, err error)
+	CreateOrder(ctx context.Context, input model.CreateOrderInput) (orderID string, err error)
+	CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (orderItemID string, err error)
 	UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result sql.Result, err error)
 	GetOrdersForAdmin(ctx context.Context, input model.GetOrdersForAdminInput) (result []database.GetOrdersForAdminRow, err error)
 	GetOrderForAdmin(ctx context.Context, input model.GetOrderInput) (result database.GetOrderForAdminRow, err error)
@@ -41,7 +42,7 @@ func (or *orderRepo) GetOrderSummary(ctx context.Context) (result []database.Get
 
 // GetOrderForAdmin implements IOrderRepo.
 func (or *orderRepo) GetOrderForAdmin(ctx context.Context, input model.GetOrderInput) (result database.GetOrderForAdminRow, err error) {
-	result, err = or.queries.GetOrderForAdmin(ctx, int32(input.OrderID))
+	result, err = or.queries.GetOrderForAdmin(ctx, input.OrderID)
 	if err != nil {
 		return result, err
 	}
@@ -52,8 +53,8 @@ func (or *orderRepo) GetOrderForAdmin(ctx context.Context, input model.GetOrderI
 // GetOrderStatus implements IOrderRepo.
 func (or *orderRepo) GetOrderStatus(ctx context.Context, input model.GetOrderStatusInput) (result database.NullOrdersStatus, err error) {
 	result, err = or.queries.GetOrderStatus(ctx, database.GetOrderStatusParams{
-		ID:     int32(input.OrderID),
-		UserID: int32(ctx.Value("userID").(int)),
+		ID:     input.OrderID,
+		UserID: ctx.Value("userID").(string),
 	})
 
 	if err != nil {
@@ -96,7 +97,7 @@ func (or *orderRepo) GetOrdersForAdmin(ctx context.Context, input model.GetOrder
 // UpdateStatus implements IOrderRepo.
 func (or *orderRepo) UpdateStatus(ctx context.Context, input model.UpdateStatusInput) (result sql.Result, err error) {
 	result, err = or.queries.UpdateStatus(ctx, database.UpdateStatusParams{
-		ID:     int32(input.OrderID),
+		ID:     input.OrderID,
 		Status: database.NullOrdersStatus{OrdersStatus: database.OrdersStatus(input.Status), Valid: input.Status != ""},
 	})
 	if err != nil {
@@ -107,8 +108,8 @@ func (or *orderRepo) UpdateStatus(ctx context.Context, input model.UpdateStatusI
 }
 
 // GetOrderItem implements IOrderRepo.
-func (or *orderRepo) GetOrderItems(ctx context.Context, orderID int) (result []database.GetOrderItemsRow, err error) {
-	result, err = or.queries.GetOrderItems(ctx, int32(orderID))
+func (or *orderRepo) GetOrderItems(ctx context.Context, orderID string) (result []database.GetOrderItemsRow, err error) {
+	result, err = or.queries.GetOrderItems(ctx, orderID)
 	if err != nil {
 		return result, err
 	}
@@ -119,8 +120,8 @@ func (or *orderRepo) GetOrderItems(ctx context.Context, orderID int) (result []d
 // GetOrder implements IOrderRepo.
 func (or *orderRepo) GetOrder(ctx context.Context, input model.GetOrderInput) (result database.GetOrderRow, err error) {
 	result, err = or.queries.GetOrder(ctx, database.GetOrderParams{
-		ID:     int32(input.OrderID),
-		UserID: int32(ctx.Value("userID").(int)),
+		ID:     input.OrderID,
+		UserID: ctx.Value("userID").(string),
 	})
 	if err != nil {
 		return result, err
@@ -132,7 +133,7 @@ func (or *orderRepo) GetOrder(ctx context.Context, input model.GetOrderInput) (r
 // GetOrders implements IOrderRepo.
 func (or *orderRepo) GetOrders(ctx context.Context, input model.GetOrdersInput) (result []database.GetOrdersRow, err error) {
 	result, err = or.queries.GetOrders(ctx, database.GetOrdersParams{
-		UserID: int32(ctx.Value("userID").(int)),
+		UserID: ctx.Value("userID").(string),
 		Limit:  int32(input.Limit),
 		Offset: int32(input.Page),
 	})
@@ -151,8 +152,10 @@ func (or *orderRepo) WithTx(tx *sql.Tx) IOrderRepo {
 }
 
 // CreateOrderItem implements IOrderRepo.
-func (or *orderRepo) CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (result sql.Result, err error) {
-	result, err = or.queries.CreateOrderItem(ctx, database.CreateOrderItemParams{
+func (or *orderRepo) CreateOrderItem(ctx context.Context, input model.CreateOrderItemInput) (orderItemID string, err error) {
+	orderItemID = uuidv4.GenerateUUID()
+	_, err = or.queries.CreateOrderItem(ctx, database.CreateOrderItemParams{
+		ID:          orderItemID,
 		OrderID:     input.OrderID,
 		Name:        input.Name,
 		Description: sql.NullString{String: input.Description, Valid: input.Description != ""},
@@ -161,25 +164,27 @@ func (or *orderRepo) CreateOrderItem(ctx context.Context, input model.CreateOrde
 		ImageUrl:    input.ImageUrl,
 	})
 	if err != nil {
-		return result, err
+		return orderItemID, err
 	}
 
-	return result, nil
+	return orderItemID, nil
 }
 
 // CreateOrder implements IOrderRepo.
-func (or *orderRepo) CreateOrder(ctx context.Context, input model.CreateOrderInput) (result sql.Result, err error) {
-	result, err = or.queries.CreateOrder(ctx, database.CreateOrderParams{
-		UserID:          int32(ctx.Value("userID").(int)),
+func (or *orderRepo) CreateOrder(ctx context.Context, input model.CreateOrderInput) (orderID string, err error) {
+	orderID = uuidv4.GenerateUUID()
+	_, err = or.queries.CreateOrder(ctx, database.CreateOrderParams{
+		ID:              orderID,
+		UserID:          ctx.Value("userID").(string),
 		PaymentMethod:   database.OrdersPaymentMethod(input.PaymentMethod),
 		ShippingAddress: input.ShippingAddress,
 		Total:           int64(input.TotalPrice),
 	})
 	if err != nil {
-		return result, err
+		return orderID, err
 	}
 
-	return result, nil
+	return orderID, nil
 }
 
 func NewOrderRepo(dbConn *sql.DB) IOrderRepo {

@@ -20,8 +20,8 @@ services:
     networks:
       - my_custom_network
     container_name: redis
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "6379:6379"
 
   kafka:
     image: apache/kafka:latest
@@ -44,9 +44,9 @@ services:
       KAFKA_LISTENER_NAME_CONTROLLER_LISTENER: CONTROLLER  
       KAFKA_LISTENERS_CONTROLLER: CONTROLLER://0.0.0.0:9093  
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER  
-    ports:
-      - "9092:9092"   
-      - "9093:9093"
+    # ports:
+    #   - "9092:9092"   
+    #   - "9093:9093"
 
 networks:
   my_custom_network:

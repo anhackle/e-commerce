@@ -39,7 +39,7 @@ docker build -t ecommerce:latest .
 
 ### 7. Run the backend container
 ```
-docker run --network ecommerce_network -p 8082:8082 -it ecommerce:latest
+docker run --name ecommerce_backend --network ecommerce_network -p 8082:8082 -it ecommerce:latest
 ```
 
 ## 📝 Tech Stack

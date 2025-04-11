@@ -12,8 +12,8 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       TZ: Asia/Bangkok
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"
 
   redis:
     image: redis:latest

@@ -10,7 +10,9 @@ func Run() {
 	LoadConfig()
 	InitLogger()
 	InitMysql()
-	InitRedis()
+	// InitRedis()
+	InitRedisSentinel()
+	InitRistretto()
 	InitValidator()
 
 	r := InitRouter()

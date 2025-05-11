@@ -27,3 +27,29 @@ func InitRedis() {
 
 	global.Rdb = rdb
 }
+
+func InitRedisSentinel() {
+	rdb := redis.NewFailoverClient(&redis.FailoverOptions{
+		MasterName: "redis-master",
+		SentinelAddrs: []string{
+			"sentinel-master:26379",
+			"sentinel-slave1:26379",
+			"sentinel-slave2:26379",
+		},
+		DB:       0,
+		Password: "",
+	})
+
+	_, err := rdb.Ping(ctx).Result()
+	if err != nil {
+		global.Logger.Error("Redis initialization error", zap.Error(err))
+	}
+
+	err = rdb.Set(ctx, "test_key", "Hello Redis Sentinel", 0).Err()
+	if err != nil {
+		global.Logger.Error("Redis set error", zap.Error(err))
+		panic(err)
+	}
+
+	global.Rdb = rdb
+}

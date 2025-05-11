@@ -4,7 +4,7 @@ services:
   mysql:
     image: mysql:5.7
     networks:
-      - my_custom_network
+      - dev_network
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root_password
@@ -12,21 +12,13 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       TZ: Asia/Bangkok
-    # ports:
-    #   - "3306:3306"
-
-  redis:
-    image: redis:latest
-    networks:
-      - my_custom_network
-    container_name: redis
-    # ports:
-    #   - "6379:6379"
+    ports:
+      - "3306:3306"
 
   kafka:
     image: apache/kafka:latest
     networks:
-      - my_custom_network
+      - dev_network
     container_name: kafka
     environment:
       KAFKA_PROCESS_ROLES: broker,controller  
@@ -44,11 +36,10 @@ services:
       KAFKA_LISTENER_NAME_CONTROLLER_LISTENER: CONTROLLER  
       KAFKA_LISTENERS_CONTROLLER: CONTROLLER://0.0.0.0:9093  
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER  
-    # ports:
-    #   - "9092:9092"   
-    #   - "9093:9093"
+    ports:
+      - "9092:9092"   
+      - "9093:9093"
 
 networks:
-  my_custom_network:
-    name: ecommerce_network
-    driver: bridge
+  dev_network:
+    external: true

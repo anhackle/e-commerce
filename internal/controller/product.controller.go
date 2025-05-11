@@ -67,6 +67,17 @@ func (pc *ProductController) GetProductsForAdmin(c *gin.Context) {
 	response.HandleResult(c, result, products)
 }
 
+func (pc *ProductController) GetProduct(c *gin.Context) {
+	var input model.GetProductInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		response.ErrorResponseExternal(c, response.ErrCodeExternal, nil)
+		return
+	}
+
+	product, result, _ := pc.productService.GetProduct(c, input)
+	response.HandleResult(c, result, product)
+}
+
 func NewProductController(productService service.IProductService) *ProductController {
 	return &ProductController{
 		productService: productService,

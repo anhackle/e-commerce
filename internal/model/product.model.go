@@ -57,3 +57,16 @@ type GetProductsForAdminOutput struct {
 	Quantity    int    `json:"quantity"`
 	ImageURL    string `json:"image_url"`
 }
+
+type GetProductInput struct {
+	ID string `json:"product_id" binding:"required,uuid"`
+}
+
+type GetProductOutput struct {
+	ID          string `json:"product_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       int    `json:"price"`
+	Quantity    int    `json:"quantity"`
+	ImageURL    string `json:"image_url"`
+}

@@ -10,12 +10,13 @@ import (
 type ProductRouter struct{}
 
 func (pr *ProductRouter) InitProductRouter(router *gin.RouterGroup) {
-	productController, _ := wire.InitProductRouterHandler(global.Mdb)
+	productController, _ := wire.InitProductRouterHandler(global.Mdb, global.Rdb, global.LocalCache)
 
 	productRouterPublic := router.Group("/products")
 
 	{
-		productRouterPublic.POST("/search", productController.GetProducts)
+		productRouterPublic.POST("/search/many", productController.GetProducts)
+		productRouterPublic.POST("/search/one", productController.GetProduct)
 	}
 
 	productRouterPrivate := router.Group("/admin/products")

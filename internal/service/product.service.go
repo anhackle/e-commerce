@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 
 	"github.com/anle/codebase/internal/model"
 	"github.com/anle/codebase/internal/repo"
@@ -15,10 +17,13 @@ type IProductService interface {
 	DeleteProduct(ctx context.Context, input model.DeleteProductInput) (result int, err error)
 	GetProducts(ctx context.Context, input model.GetProductsInput) (products []model.GetProductsOutput, result int, err error)
 	GetProductsForAdmin(ctx context.Context, input model.GetProductsForAdminInput) (products []model.GetProductsForAdminOutput, result int, err error)
+	GetProduct(ctx context.Context, input model.GetProductInput) (product model.GetProductOutput, result int, err error)
 }
 
 type productService struct {
 	productRepo repo.IProductRepo
+	redisCache  repo.IRedisCache
+	localCache  repo.ILocalCache
 }
 
 // GetProductsForAdmin implements IProductService.
@@ -146,8 +151,63 @@ func (ps *productService) CreateProduct(ctx context.Context, input model.CreateP
 	return result, err
 }
 
-func NewProductService(productRepo repo.IProductRepo) IProductService {
+func (ps *productService) GetKeyProductCache(productID string) string {
+	return fmt.Sprintf("product:%s", productID)
+}
+
+func (ps *productService) GetProduct(ctx context.Context, input model.GetProductInput) (product model.GetProductOutput, result int, err error) {
+	productCache, found := ps.localCache.Get(ctx, ps.GetKeyProductCache(input.ID))
+	if found {
+		err = json.Unmarshal([]byte(productCache), &product)
+		if err != nil {
+			return product, response.ErrCodeInternal, err
+		}
+
+		return product, response.ErrCodeSuccess, nil
+	}
+
+	productCache, err = ps.redisCache.Get(ctx, ps.GetKeyProductCache(input.ID))
+	if err != nil {
+		return product, response.ErrCodeInternal, err
+	}
+
+	if productCache != "" {
+		err = json.Unmarshal([]byte(productCache), &product)
+		if err != nil {
+			return product, response.ErrCodeInternal, err
+		}
+		ps.localCache.SetWithTTL(ctx, ps.GetKeyProductCache(input.ID), product)
+
+		return product, response.ErrCodeSuccess, nil
+	}
+
+	productRepo, err := ps.productRepo.GetProductByID(ctx, input.ID)
+	if err != nil {
+		return product, response.ErrCodeInternal, err
+	}
+
+	product = model.GetProductOutput{
+		ID:          productRepo.ID,
+		Name:        productRepo.Name,
+		Description: productRepo.Description.String,
+		Price:       int(productRepo.Price),
+		Quantity:    int(productRepo.Quantity),
+		ImageURL:    productRepo.ImageUrl,
+	}
+	err = ps.redisCache.Set(ctx, ps.GetKeyProductCache(input.ID), product, 60*60)
+	if err != nil {
+		return product, response.ErrCodeInternal, err
+	}
+
+	ps.localCache.SetWithTTL(ctx, ps.GetKeyProductCache(input.ID), product)
+
+	return product, response.ErrCodeSuccess, nil
+}
+
+func NewProductService(productRepo repo.IProductRepo, redisCache repo.IRedisCache, localCache repo.ILocalCache) IProductService {
 	return &productService{
 		productRepo: productRepo,
+		redisCache:  redisCache,
+		localCache:  localCache,
 	}
 }

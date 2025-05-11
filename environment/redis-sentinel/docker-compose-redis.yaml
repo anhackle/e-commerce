@@ -1,0 +1,65 @@
+version: '3.7'
+services:
+  master:
+    image: 'redis:5.0.9'
+    container_name: 'redis-master'
+    restart: always
+    command: redis-server --appendonly yes
+    ports:
+      - 6379:6379
+    networks:
+      - dev_network
+  slave1:
+    image: 'redis:5.0.9'
+    container_name: 'redis-slave1'
+    restart: always
+    command: redis-server --appendonly yes --slaveof master 6379
+    ports:
+      - 6380:6379
+    networks:
+      - dev_network
+  slave2:
+    image: 'redis:5.0.9'
+    container_name: 'redis-slave2'
+    restart: always
+    command: redis-server --appendonly yes --slaveof master 6379
+    ports:
+      - 6381:6379
+    networks:
+      - dev_network
+  sentinel-master:
+    image: redis:5.0.9
+    container_name: redis-sentinel-master
+    restart: always
+    command: redis-sentinel /etc/redis/sentinel.conf
+    volumes:
+      - ./sentinel.conf:/etc/redis/sentinel.conf
+    ports:
+      - 26379:26379
+    networks:
+      - dev_network
+  sentinel-slave1:
+    image: redis:5.0.9
+    container_name: redis-sentinel-slave1
+    restart: always
+    command: redis-sentinel /etc/redis/sentinel.conf
+    volumes:
+      - ./sentinel.conf:/etc/redis/sentinel.conf
+    ports:
+      - 26380:26379
+    networks:
+      - dev_network
+  sentinel-slave2:
+    image: redis:5.0.9
+    container_name: redis-sentinel-slave2
+    restart: always
+    command: redis-sentinel /etc/redis/sentinel.conf
+    volumes:
+      - ./sentinel.conf:/etc/redis/sentinel.conf
+    ports:
+      - 26381:26379
+    networks:
+      - dev_network
+networks:
+  dev_network:
+    external: true

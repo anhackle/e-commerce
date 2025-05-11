@@ -11,6 +11,8 @@ import (
 	"github.com/anle/codebase/internal/controller"
 	"github.com/anle/codebase/internal/repo"
 	"github.com/anle/codebase/internal/service"
+	"github.com/dgraph-io/ristretto/v2"
+	"github.com/redis/go-redis/v9"
 )
 
 // Injectors from authen.wire.go:
@@ -45,9 +47,11 @@ func InitOrderRouterHandler(dbc *sql.DB) (*controller.OrderController, error) {
 
 // Injectors from product.wire.go:
 
-func InitProductRouterHandler(dbc *sql.DB) (*controller.ProductController, error) {
+func InitProductRouterHandler(dbc *sql.DB, redisClient *redis.Client, localCache *ristretto.Cache[string, string]) (*controller.ProductController, error) {
 	iProductRepo := repo.NewProductRepo(dbc)
-	iProductService := service.NewProductService(iProductRepo)
+	iRedisCache := repo.NewRedisCache(redisClient)
+	iLocalCache := repo.NewLocalCache(localCache)
+	iProductService := service.NewProductService(iProductRepo, iRedisCache, iLocalCache)
 	productController := controller.NewProductController(iProductService)
 	return productController, nil
 }

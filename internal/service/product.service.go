@@ -119,7 +119,7 @@ func (ps *productService) CreateProduct(ctx context.Context, input model.CreateP
 	}
 
 	// if product was not deleted --> update quantity = quantity + plus
-	if product.DeletedAt.Valid == false {
+	if !product.DeletedAt.Valid {
 		result, err = ps.UpdateProduct(ctx, model.UpdateProductInput{
 			ID:          product.ID,
 			Name:        input.Name,
@@ -181,25 +181,37 @@ func (ps *productService) GetProduct(ctx context.Context, input model.GetProduct
 		return product, response.ErrCodeSuccess, nil
 	}
 
-	productRepo, err := ps.productRepo.GetProductByID(ctx, input.ID)
+	lockey := fmt.Sprintf("lock:productItem:%s", input.ID)
+	err = ps.redisCache.WithDistributedLock(ctx, lockey, 5, func(ctx context.Context) error {
+		productRepo, err := ps.productRepo.GetProductByID(ctx, input.ID)
+		if err != nil {
+			return err
+		}
+
+		product = model.GetProductOutput{
+			ID:          productRepo.ID,
+			Name:        productRepo.Name,
+			Description: productRepo.Description.String,
+			Price:       int(productRepo.Price),
+			Quantity:    int(productRepo.Quantity),
+			ImageURL:    productRepo.ImageUrl,
+		}
+		err = ps.redisCache.Set(ctx, ps.GetKeyProductCache(input.ID), product, 60*60)
+		if err != nil {
+			return err
+		}
+
+		_, err = ps.localCache.SetWithTTL(ctx, ps.GetKeyProductCache(input.ID), product)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return product, response.ErrCodeInternal, err
 	}
-
-	product = model.GetProductOutput{
-		ID:          productRepo.ID,
-		Name:        productRepo.Name,
-		Description: productRepo.Description.String,
-		Price:       int(productRepo.Price),
-		Quantity:    int(productRepo.Quantity),
-		ImageURL:    productRepo.ImageUrl,
-	}
-	err = ps.redisCache.Set(ctx, ps.GetKeyProductCache(input.ID), product, 60*60)
-	if err != nil {
-		return product, response.ErrCodeInternal, err
-	}
-
-	ps.localCache.SetWithTTL(ctx, ps.GetKeyProductCache(input.ID), product)
 
 	return product, response.ErrCodeSuccess, nil
 }

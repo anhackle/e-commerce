@@ -11,7 +11,7 @@ import (
 type ILocalCache interface {
 	Get(ctx context.Context, key string) (value string, found bool)
 	Set(ctx context.Context, key string, value interface{}) (result bool)
-	SetWithTTL(ctx context.Context, key string, value interface{}) (result bool)
+	SetWithTTL(ctx context.Context, key string, value interface{}) (result bool, err error)
 	Del(ctx context.Context, key string) error
 	Incr(ctx context.Context, key string) (int64, error)
 	Decr(ctx context.Context, key string) (int64, error)
@@ -23,10 +23,13 @@ type localCache struct {
 }
 
 // SetWithTTL implements ILocalCache.
-func (lc *localCache) SetWithTTL(ctx context.Context, key string, value interface{}) (result bool) {
-	jsonValue, _ := json.Marshal(value)
+func (lc *localCache) SetWithTTL(ctx context.Context, key string, value interface{}) (result bool, err error) {
+	jsonValue, err := json.Marshal(value)
+	if err != nil {
+		return result, err
+	}
 
-	return lc.client.SetWithTTL(key, string(jsonValue), 1, 5*time.Minute)
+	return lc.client.SetWithTTL(key, string(jsonValue), 1, 5*time.Minute), nil
 }
 
 // Decr implements IRedisCache.

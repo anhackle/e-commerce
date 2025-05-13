@@ -3,8 +3,10 @@ package repo
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
+	"github.com/bsm/redislock"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -15,10 +17,28 @@ type IRedisCache interface {
 	Incr(ctx context.Context, key string) (int64, error)
 	Decr(ctx context.Context, key string) (int64, error)
 	Exists(ctx context.Context, key string) (bool, error)
+
+	WithDistributedLock(ctx context.Context, key string, ttlSeconds int, fn func(ctx context.Context) error) error
 }
 
 type redisCache struct {
 	client *redis.Client
+	locker *redislock.Client
+}
+
+// WithDistributedLock implements IRedisCache.
+func (r *redisCache) WithDistributedLock(ctx context.Context, key string, ttlSeconds int, fn func(ctx context.Context) error) error {
+	lockTTL := time.Duration(ttlSeconds) * time.Second
+	lock, err := r.locker.Obtain(ctx, key, lockTTL, nil)
+	if err == redislock.ErrNotObtained {
+		return errors.New("lock can not obtained")
+	} else if err != nil {
+		return errors.New("fail to obtain lock")
+	}
+
+	defer lock.Release(ctx)
+
+	return fn(ctx)
 }
 
 // Decr implements IRedisCache.
@@ -69,5 +89,6 @@ func (r *redisCache) Set(ctx context.Context, key string, value any, expiration 
 func NewRedisCache(client *redis.Client) IRedisCache {
 	return &redisCache{
 		client: client,
+		locker: redislock.New(client),
 	}
 }
